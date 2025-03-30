@@ -1,11 +1,11 @@
 import React from 'react';
-import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
-import Button from '@material-ui/core/Button';
-import { makeStyles } from '@material-ui/core/styles';
-import Avatar from '@material-ui/core/Avatar';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import Button from '@mui/material/Button';
+import { makeStyles } from '@mui/styles';
+import Avatar from '@mui/material/Avatar';
 import ChipsArray from './ChipsArray';
-import BookmarkIcon from '@material-ui/icons/Bookmark';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 
 const Categories = (props) => {
   const proceed = (e) => {

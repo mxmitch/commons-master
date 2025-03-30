@@ -1,27 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import Collapse from '@material-ui/core/Collapse';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import { red, grey } from '@material-ui/core/colors';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import BookmarkIcon from '@material-ui/icons/Bookmark';
-import Tooltip from '@material-ui/core/Tooltip';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
-import CloseIcon from '@material-ui/icons/Close';
-import Snackbar from '@material-ui/core/Snackbar';
-import SnackbarContent from '@material-ui/core/SnackbarContent';
-import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
-import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
-import Chip from '@material-ui/core/Chip';
-import DoneOutlineIcon from '@material-ui/icons/DoneOutline';
-import ClearIcon from '@material-ui/icons/Clear';
-import AccessTimeIcon from '@material-ui/icons/AccessTime';
+import { makeStyles } from '@mui/styles';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
+import Collapse from '@mui/material/Collapse';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import { red, grey } from '@mui/material/colors';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import Tooltip from '@mui/material/Tooltip';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import CloseIcon from '@mui/icons-material/Close';
+import Snackbar from '@mui/material/Snackbar';
+import SnackbarContent from '@mui/material/SnackbarContent';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import Chip from '@mui/material/Chip';
+import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
+import ClearIcon from '@mui/icons-material/Clear';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 import clsx from 'clsx';
 import axios from 'axios';
@@ -42,15 +41,15 @@ const useStyles = makeStyles((theme) => ({
     transform: 'rotate(180deg)'
   },
   avatar: {
-    'backgroundColor': red[500],
-    'borderRadius': '100%',
-    'width': '75px',
-    'height': '75px',
-    'color': '#FFF',
-    'fontWeight': 900,
-    'boxShadow': '10px 17px 24px -13px rgba(0,0,0,0.5)',
-    'margin': theme.spacing(2),
-    'transition': 'all 0.5s ease-in-out',
+    backgroundColor: red[500],
+    borderRadius: '100%',
+    width: '75px',
+    height: '75px',
+    color: '#FFF',
+    fontWeight: 900,
+    boxShadow: '10px 17px 24px -13px rgba(0,0,0,0.5)',
+    margin: theme.spacing(2),
+    transition: 'all 0.5s ease-in-out',
     '&:hover,&:focus': {
       color: '#10021a',
       background: '#fa7c70',
@@ -60,8 +59,8 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   billText: {
-    'backgroundColor': grey[200],
-    'transition': 'all 0.5s ease-in-out',
+    backgroundColor: grey[200],
+    transition: 'all 0.5s ease-in-out',
     '&:hover,&:focus': {
       color: '#10021a',
       background: '#fa7c70',
@@ -84,21 +83,11 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-/**
- *
- * @param {{
- *  key: Number,
- *  setThisOneClicked: (),
- *  bill: { bill_state },
- *  style: { style_object },
- *  onRender: ()
- * }} props
- */
 export default function BillCard(props) {
   const classes = useStyles();
   const [expanded, setExpanded] = useState(false);
   const [events, setEvents] = useState('No events currently loaded.');
-  const [color, setColor] = useState('');
+  const [color, setColor] = useState('');  
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -153,30 +142,18 @@ export default function BillCard(props) {
     getEventsForBill(props.bill.id);
   };
 
-  // Formats the date to use "Month Day, Year" format
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
-  // Adding the ' ' forces using UTC time, avoiding wrong day due to offset
-  const validDate = new Date(props.bill.introduced_date + ' ');
-  const introduced_date = !isNaN(validDate) ? validDate : null;
+  const validDate = new Date(props.bill.passed_house_first_reading_date);
+  const passed_house_first_reading_date = !isNaN(validDate) ? validDate : null;
 
   const eventCards =
     Array.isArray(events) &&
     events.map((event) => {
-      // Adding the ' ' forces using UTC time, avoiding wrong day due to offset
       const publication_date = new Date(event.publication_date + ' ');
       return (
-        <CardContent>
+        <CardContent key={event.id}>
           <Grid container justify="center">
-            <Grid
-              item
-              xs={0}
-              sm={3}
-              md={2}
-              lg={2}
-              xl={1}
-              spacing={3}
-              className={classes.status}
-            ></Grid>
+            <Grid item xs={0} sm={3} md={2} lg={2} xl={1} spacing={3} className={classes.status}></Grid>
             <Grid item xs={4} sm={3} md={3} lg={3} xl={3}>
               <Typography body>
                 <strong>
@@ -196,20 +173,8 @@ export default function BillCard(props) {
     <Card className={classes.root}>
       <CardContent>
         <Grid container justify="center">
-          <Grid
-            item
-            xs={6}
-            sm={3}
-            md={2}
-            lg={2}
-            xl={1}
-            spacing={3}
-            className={classes.status}
-          >
-            <Tooltip
-              title="View bill page on parliament's website."
-              placement="right"
-            >
+          <Grid item xs={6} sm={3} md={2} lg={2} xl={1} spacing={3} className={classes.status}>
+            <Tooltip title="View bill page on parliament's website." placement="right">
               <Button
                 href={props.bill.page_url}
                 variant="contained"
@@ -217,10 +182,10 @@ export default function BillCard(props) {
                 target="_blank"
               >
                 Bill<br></br>
-                {props.bill.code}
+                {props.bill.bill_number}
               </Button>
             </Tooltip>
-            {props.bill.passed === true ? (
+            {props.bill.passed_house_first_reading_date ? (
               <Tooltip title="This bill has been passed." placement="bottom">
                 <Chip
                   label="Passed"
@@ -230,26 +195,13 @@ export default function BillCard(props) {
                   icon={<DoneOutlineIcon />}
                 />
               </Tooltip>
-            ) : props.bill.passed === false ? (
-              <Tooltip title="This bill has been defeated." placement="bottom">
-                <Chip
-                  label="Defeated"
-                  className={classes.billChips}
-                  variant="contained"
-                  color="secondary"
-                  icon={<ClearIcon />}
-                />
-              </Tooltip>
             ) : (
-              <Tooltip
-                title="This bill is currently in progress through parliament."
-                placement="bottom"
-              >
+              <Tooltip title="This bill is in progress." placement="bottom">
                 <Chip
                   label="In Progress"
                   className={classes.billChips}
                   variant="outlined"
-                  color="basic"
+                  color="default"
                   icon={<AccessTimeIcon />}
                 />
               </Tooltip>
@@ -257,13 +209,12 @@ export default function BillCard(props) {
           </Grid>
           <Grid item xs={10} sm={7} md={8} lg={8} xl={10}>
             <Typography>
-              <strong>{props.bill.title}</strong>
+              <strong>{props.bill.long_title_en}</strong>
             </Typography>
             <Typography style={{ marginBottom: '16px' }}>
-              {introduced_date
-                ? 'Introduced on ' +
-                  introduced_date.toLocaleDateString('en-US', options)
-                : 'The introduced date of this bill is not available.'}
+              {passed_house_first_reading_date
+                ? 'Passed first reading on ' + passed_house_first_reading_date.toLocaleDateString('en-US', options)
+                : 'First reading date not available.'}
             </Typography>
             <Grid container direction="row">
               <Grid item xs={12}>
@@ -273,7 +224,7 @@ export default function BillCard(props) {
                   component="p"
                   style={{ marginBottom: '24px' }}
                 >
-                  {props.bill.description}
+                  {props.bill.description || 'No description available.'}
                 </Typography>
                 <Grid container xs={12} spacing={2} style={{ display: 'flex' }}>
                   <Grid item>
@@ -310,7 +261,7 @@ export default function BillCard(props) {
                       </Tooltip>
                     ) : (
                       <Tooltip
-                        title="The legislative summary for this bill is not yet available. This link will be updated when the summary becomes available."
+                        title="Summary not available."
                         placement="right"
                       >
                         <div>
@@ -364,8 +315,8 @@ export default function BillCard(props) {
                     }}
                     message={
                       props.user.user_bills.includes(props.bill.id)
-                        ? `Bill ${props.bill.code} added to watchlist`
-                        : `Bill ${props.bill.code} removed from watchlist`
+                        ? `Bill ${props.bill.bill_number} added to watchlist`
+                        : `Bill ${props.bill.bill_number} removed from watchlist`
                     }
                     action={
                       <>

@@ -1,16 +1,14 @@
 import React from 'react';
-// @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-// core components
-import Footer from 'components/Footer/Footer.js';
-import GridItem from 'components/Grid/GridItem.js';
-import Card from 'components/Card/Card.js';
+import { makeStyles } from '@mui/styles';
+import Container from '@mui/material/Container';
+import Footer from '../../components/Footer/Footer.js';
+import GridItem from '../../components/Grid/GridItem.js';
+import Card from '../../components/Card/Card.js';
 import Login from './Login.js';
 
-import styles from 'assets/jss/material-kit-react/views/loginPage.js';
+import styles from '../../assets/jss/material-kit-react/views/loginPage.js';
 
-import image from 'assets/img/bg5.jpg';
+import image from '../../assets/img/bg5.jpg';
 
 const useStyles = makeStyles(styles);
 

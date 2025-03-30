@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-import { Typography, TextField, Button, Avatar } from '@material-ui/core';
-import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import { makeStyles } from '@mui/styles';
+import Container from '@mui/material/Container';
+import { Typography, TextField, Button, Avatar } from '@mui/material/';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 import axios from 'axios';
 
@@ -310,7 +310,7 @@ const Signup = (props) => {
         />
       </form>
       <Button
-        classNames={classes.button}
+        classnames={classes.button}
         color="primary"
         variant="contained"
         onClick={proceed}

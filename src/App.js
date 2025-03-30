@@ -1,17 +1,16 @@
 import React, { useEffect, useState, Fragment } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import axios from "axios";
 
-import Home from "views/HomePage/Home.js";
-// import LandingPage from "views/LandingPage/LandingPage.js";
-import ProfilePage from "views/ProfilePage/ProfilePage.js";
-import LoginPage from "views/LoginPage/LoginPage.js";
-import SignupPage from "views/SignupPage/SignupPage.js";
-import WatchListPage from "views/WatchListPage/WatchListPage.js";
-import LoadingSpinner from "views/LoadingSpinner/LoadingSpinner.js";
-import Header from "views/Header/Header";
+import Home from "./views/HomePage/Home.js";
+import ProfilePage from "./views/ProfilePage/ProfilePage.js";
+import LoginPage from "./views/LoginPage/LoginPage.js";
+import SignupPage from "./views/SignupPage/SignupPage.js";
+import WatchListPage from "./views/WatchListPage/WatchListPage.js";
+import LoadingSpinner from "./views/LoadingSpinner/LoadingSpinner.js";
+import Header from "./views/Header/Header";
 
-import useLoading from "hooks/useLoading";
+import useLoading from "./hooks/useLoading";
 
 const App = (props) => {
   const [user, setUser] = useState();
@@ -32,12 +31,16 @@ const App = (props) => {
   const fetchBills = async () => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_COMMONS_API}/bills`
+        `${process.env.REACT_APP_COMMONS_API}/api/bills`,
+        {
+          withCredentials: true, // Ensure cookies and credentials are included in the request
+        }
       );
 
       const sortedBills = response.data.bills.sort(
         (a, b) => new Date(b.introduced_date) - new Date(a.introduced_date)
       );
+      console.log(sortedBills);
 
       setBills(sortedBills);
       setCategories(response.data.categories);
@@ -50,7 +53,7 @@ const App = (props) => {
   const loginStatus = async () => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_COMMONS_API}/logged_in`
+        `${process.env.REACT_APP_COMMONS_API}/api/auth/logged_in`
       );
       if (response.data.logged_in) {
         handleLogin(response.data);
@@ -71,14 +74,9 @@ const App = (props) => {
         }
       );
       if (res.data.status === 200) {
-        // back end is only returning the user data and their categories, keep the old
-        // user_bills (aka watchlist)
-        // Other option is to have the API server return the user's bill
         setUser((prev) => ({ ...res.data.user, user_bills: prev.user_bills }));
       } else {
-        console.error(
-          `Error occurred on handleProfileUpdate: ${res.data.errors}`
-        );
+        console.error(`Error occurred on handleProfileUpdate: ${res.data.errors}`);
       }
     } catch (error) {
       console.error(`Error occurred on handleProfileUpdate: ${error}`);
@@ -114,7 +112,7 @@ const App = (props) => {
 
   return (
     <div>
-      <Router history={props.hist}>
+      <Router>
         {loading && (
           <div
             style={{
@@ -125,7 +123,7 @@ const App = (props) => {
               justifyContent: "center"
             }}
           >
-            <LoadingSpinner></LoadingSpinner>
+            <LoadingSpinner />
           </div>
         )}
         {!loading && (
@@ -143,13 +141,11 @@ const App = (props) => {
               handleLogout={handleLogout}
               {...props}
             />
-            <Switch>
+            <Routes>
               <Route
-                exact
                 path="/"
-                render={(props) => (
+                element={
                   <Home
-                    {...props}
                     bills={bills}
                     categories={categories}
                     handleLogout={handleLogout}
@@ -157,35 +153,32 @@ const App = (props) => {
                     user={user}
                     updateWatchList={updateWatchList}
                   />
-                )}
+                }
               />
               <Route
                 path="/login-page"
-                render={(props) => (
+                element={
                   <LoginPage
-                    {...props}
                     handleLogin={handleLogin}
                     loggedInStatus={loggedIn}
                     history={props.history}
                   />
-                )}
+                }
               />
               <Route
                 path="/signup-page"
-                render={(props) => (
+                element={
                   <SignupPage
-                    {...props}
                     categories={categories}
                     handleLogin={handleLogin}
                     loggedInStatus={loggedIn}
                   />
-                )}
+                }
               />
               <Route
                 path="/watch-list"
-                render={(props) => (
+                element={
                   <WatchListPage
-                    {...props}
                     bills={bills}
                     user={user}
                     categories={categories}
@@ -193,20 +186,20 @@ const App = (props) => {
                     loggedInStatus={loggedIn}
                     updateWatchList={updateWatchList}
                   />
-                )}
+                }
               />
               <Route
                 path="/user/:id"
-                render={() => (
+                element={
                   <ProfilePage
                     user={user}
                     handleProfileUpdate={handleProfileUpdate}
                     categories={categories}
                     loggedInStatus={loggedIn}
                   />
-                )}
+                }
               />
-            </Switch>
+            </Routes>
           </Fragment>
         )}
       </Router>

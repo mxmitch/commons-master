@@ -1,14 +1,14 @@
 import React from 'react';
 
-import { makeStyles } from '@material-ui/core/styles';
-import Avatar from '@material-ui/core/Avatar';
-import PersonIcon from '@material-ui/icons/Person';
-import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@mui/styles';
+import Avatar from '@mui/material/Avatar';
+import PersonIcon from '@mui/icons-material/Person';
+import Grid from '@mui/material/Grid';
 
 import ProfileText from './ProfileText';
 import FindMyMp from './FindMyMp';
-import { Typography } from '@material-ui/core';
-import { Divider } from '@material-ui/core';
+import { Typography } from '@mui/material';
+import Divider from '@mui/material/Divider';
 
 const useStyles = makeStyles((theme) => ({
   root: {

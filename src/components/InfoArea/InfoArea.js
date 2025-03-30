@@ -2,9 +2,9 @@ import React from "react";
 // nodejs library to set properties for components
 import PropTypes from "prop-types";
 // nodejs library that concatenates classes
-import classNames from "classnames";
+import classnames from "classnames";
 // @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
 
 import styles from "assets/jss/material-kit-react/components/infoStyle.js";
 
@@ -13,12 +13,12 @@ const useStyles = makeStyles(styles);
 export default function InfoArea(props) {
   const classes = useStyles();
   const { title, description, iconColor, vertical } = props;
-  const iconWrapper = classNames({
+  const iconWrapper = classnames({
     [classes.iconWrapper]: true,
     [classes[iconColor]]: true,
     [classes.iconWrapperVertical]: vertical
   });
-  const iconClasses = classNames({
+  const iconClasses = classnames({
     [classes.icon]: true,
     [classes.iconVertical]: vertical
   });

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Chip from '@material-ui/core/Chip';
-import DoneItem from '@material-ui/icons/Done';
+import { makeStyles } from '@mui/styles';
+import Chip from '@mui/material/Chip';
+import DoneItem from '@mui/icons-material/Done';
 
 const useStyles = makeStyles((theme) => ({
   root: {

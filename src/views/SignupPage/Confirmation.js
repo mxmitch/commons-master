@@ -1,11 +1,11 @@
 import React from 'react';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import { makeStyles } from '@material-ui/core/styles';
-import Avatar from '@material-ui/core/Avatar';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import { makeStyles } from '@mui/styles';
+import Avatar from '@mui/material/Avatar';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import idToCategoryName from './helpers/idToCategoryName';
 

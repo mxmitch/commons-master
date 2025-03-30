@@ -1,20 +1,20 @@
 import React from 'react';
 // nodejs library that concatenates classes
-import classNames from 'classnames';
+import classnames from 'classnames';
 // nodejs library to set properties for components
 import PropTypes from 'prop-types';
 // @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
-import Hidden from '@material-ui/core/Hidden';
-import Drawer from '@material-ui/core/Drawer';
+import { makeStyles } from '@mui/styles';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import Hidden from '@mui/material/Hidden';
+import Drawer from '@mui/material/Drawer';
 // @material-ui/icons
-import Menu from '@material-ui/icons/Menu';
+import Menu from '@mui/material/Menu';
 // core components
-import styles from 'assets/jss/material-kit-react/components/headerStyle.js';
+import styles from '../../assets/jss/material-kit-react/components/headerStyle.js';
 // react router
 import { Link } from 'react-router-dom';
 
@@ -25,6 +25,7 @@ const useStyles = makeStyles(styles);
 export default function Header(props) {
   const classes = useStyles();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+
   React.useEffect(() => {
     if (props.changeColorOnScroll) {
       window.addEventListener('scroll', headerColorChange);
@@ -34,10 +35,12 @@ export default function Header(props) {
         window.removeEventListener('scroll', headerColorChange);
       }
     };
-  });
+  }, [props.changeColorOnScroll]);
+
   function handleDrawerToggle() {
     setMobileOpen(!mobileOpen);
   }
+
   const headerColorChange = () => {
     const { color, changeColorOnScroll } = props;
     const windowsScrollTop = window.pageYOffset;
@@ -68,7 +71,7 @@ export default function Header(props) {
   );
 
   const { color, leftLinks, brand, fixed, absolute } = props;
-  const appBarClasses = classNames({
+  const appBarClasses = classnames({
     [classes.appBar]: true,
     [classes[color]]: color,
     [classes.absolute]: absolute,
@@ -79,6 +82,7 @@ export default function Header(props) {
       <Button className={classes.title}>{brand}</Button>
     </Link>
   );
+
   return (
     <AppBar className={appBarClasses}>
       <Toolbar className={classes.container}>
@@ -125,8 +129,8 @@ export default function Header(props) {
   );
 }
 
-Header.defaultProp = {
-  color: 'white'
+Header.defaultProps = {
+  color: 'white'  // Corrected defaultProps here
 };
 
 Header.propTypes = {
@@ -146,12 +150,6 @@ Header.propTypes = {
   brand: PropTypes.string,
   fixed: PropTypes.bool,
   absolute: PropTypes.bool,
-  // this will cause the sidebar to change the color from
-  // props.color (see above) to changeColorOnScroll.color
-  // when the window.pageYOffset is heigher or equal to
-  // changeColorOnScroll.height and then when it is smaller than
-  // changeColorOnScroll.height change it back to
-  // props.color (see above)
   changeColorOnScroll: PropTypes.shape({
     height: PropTypes.number.isRequired,
     color: PropTypes.oneOf([

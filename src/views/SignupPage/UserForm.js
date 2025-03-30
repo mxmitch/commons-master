@@ -5,7 +5,7 @@ import Categories from './Categories';
 import Confirmation from './Confirmation';
 import Success from './Success';
 import axios from 'axios';
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material/';
 
 const UserForm = (props) => {
   const [name, setName] = useState('');

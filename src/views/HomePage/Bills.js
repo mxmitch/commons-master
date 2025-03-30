@@ -1,24 +1,27 @@
 import React from 'react';
 import BillCard from './BillCard';
 
-export default function Bills(props) {
-  const bills = props.bills.filter((bill) => {
-    return props.childCategory === 0
-      ? bill
-      : bill.categories.includes(props.childCategory);
+export default function Bills({ bills, childCategory, user, setUser, updateWatchList }) {
+  // Filter bills based on selected category
+  const filteredBills = bills.filter((bill) => {
+    return childCategory === 0 ? bill : bill.categories.includes(childCategory);
   });
 
-  const billCards = bills.map((bill) => {
-    return (
-      <BillCard
-        user={props.user}
-        key={bill.id}
-        bill={bill}
-        setUser={props.setUser}
-        updateWatchList={props.updateWatchList}
-      />
-    );
-  });
+  // If no bills match the filter, return a message
+  if (filteredBills.length === 0) {
+    return <div>No bills available for this category.</div>;
+  }
 
-  return billCards;
+  // Map through filtered bills and create BillCards
+  const billCards = filteredBills.map((bill) => (
+    <BillCard
+      user={user}
+      key={bill.id}
+      bill={bill}
+      setUser={setUser}
+      updateWatchList={updateWatchList}
+    />
+  ));
+
+  return <div>{billCards}</div>;
 }

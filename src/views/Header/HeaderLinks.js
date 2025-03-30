@@ -1,18 +1,18 @@
 /*eslint-disable*/
 import React, { Fragment } from 'react';
-import DeleteIcon from '@material-ui/icons/Delete';
-import Typography from '@material-ui/core/Typography';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Typography from '@mui/material/Typography';
 // react components for routing our app without refresh
 import { Link } from 'react-router-dom';
 
 // @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
-import { List, ListItem, ListItemText } from '@material-ui/core';
+import { makeStyles } from '@mui/styles';
+import { List, ListItem, ListItemText } from '@mui/material/';
 
 // core components
-import Button from 'components/CustomButtons/Button.js';
+import Button from '../../components/CustomButtons/Button.js';
 
-import styles from 'assets/jss/material-kit-react/components/headerLinksStyle.js';
+import styles from '../../assets/jss/material-kit-react/components/headerLinksStyle.js';
 
 const useStyles = makeStyles(styles);
 
@@ -25,8 +25,8 @@ export default function HeaderLinks({
   const classes = useStyles();
 
   const handleLogoutClick = (e) => {
-    handleLogout();
-    handleDrawerToggle();
+    handleLogout(); // logout the user
+    handleDrawerToggle(); // close the drawer
   };
 
   return (
@@ -59,15 +59,13 @@ export default function HeaderLinks({
             </Link>
           </ListItem>
           <ListItem className={classes.listItem}>
-            <Link to="/">
-              <Button
-                color="transparent"
-                className={classes.navLink}
-                onClick={handleLogoutClick}
-              >
-                LOG OUT
-              </Button>
-            </Link>
+            <Button
+              color="transparent"
+              className={classes.navLink}
+              onClick={handleLogoutClick}
+            >
+              LOG OUT
+            </Button>
           </ListItem>
         </Fragment>
       ) : (

@@ -1,43 +1,30 @@
 {
-  "name": "material-kit-react",
+  "name": "commons-app",
   "version": "1.8.0",
   "description": "Material Kit React. Coded by Creative Tim",
   "private": true,
   "main": "dist/index.js",
   "dependencies": {
-    "@material-ui/core": "4.3.2",
-    "@material-ui/icons": "4.2.1",
-    "axios": "^0.19.2",
-    "classnames": "2.2.6",
-    "history": "4.9.0",
-    "moment": "2.24.0",
-    "node-sass": "4.12.0",
-    "nouislider": "14.0.2",
-    "prop-types": "15.7.2",
-    "react": "16.9.0",
-    "react-datetime": "2.16.3",
-    "react-dom": "16.9.0",
-    "react-router-dom": "5.0.1",
-    "react-scripts": "3.1.0",
-    "react-slick": "0.25.2",
-    "react-swipeable-views": "0.13.3"
-  },
-  "devDependencies": {
-    "@babel/cli": "7.5.5",
-    "@babel/plugin-proposal-class-properties": "7.5.5",
-    "@babel/preset-env": "7.5.5",
-    "@babel/preset-react": "7.0.0",
-    "eslint-config-prettier": "6.0.0",
-    "eslint-plugin-prettier": "3.1.0",
-    "eslint-plugin-react": "7.14.3",
-    "gulp": "4.0.2",
-    "gulp-append-prepend": "1.0.8",
-    "prettier": "1.18.2",
-    "@storybook/addon-actions": "^5.3.13",
-    "@storybook/addon-links": "^5.3.13",
-    "@storybook/addons": "^5.3.13",
-    "@storybook/preset-create-react-app": "^1.5.2",
-    "@storybook/react": "^5.3.13"
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.8",
+    "@mui/material": "^6.4.9",
+    "@mui/styled-engine-sc": "^6.4.6",
+    "@mui/styles": "^6.4.9",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.8.4",
+    "classnames": "^2.5.1",
+    "history": "^5.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.4.0",
+    "react-scripts": "5.0.1",
+    "sass": "^1.86.0",
+    "styled-components": "^6.1.16",
+    "web-vitals": "^2.1.4"
   },
   "optionalDependencies": {
     "typescript": "3.5.3"
@@ -64,6 +51,10 @@
       "not dead",
       "not op_mini all"
     ],
-    "development": []
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

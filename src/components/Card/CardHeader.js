@@ -1,10 +1,10 @@
 import React from "react";
 // nodejs library that concatenates classes
-import classNames from "classnames";
+import classnames from "classnames";
 // nodejs library to set properties for components
 import PropTypes from "prop-types";
 // @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
 // @material-ui/icons
 
 // core components
@@ -15,7 +15,7 @@ const useStyles = makeStyles(styles);
 export default function CardHeader(props) {
   const classes = useStyles();
   const { className, children, color, plain, ...rest } = props;
-  const cardHeaderClasses = classNames({
+  const cardHeaderClasses = classnames({
     [classes.cardHeader]: true,
     [classes[color + "CardHeader"]]: color,
     [classes.cardHeaderPlain]: plain,

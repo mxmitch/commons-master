@@ -1,10 +1,10 @@
 import React from 'react';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import { makeStyles } from '@material-ui/core/styles';
-import Avatar from '@material-ui/core/Avatar';
-import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import { makeStyles } from '@mui/styles';
+import Avatar from '@mui/material/Avatar';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 
 import { Link } from 'react-router-dom';
 

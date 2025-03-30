@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 // nodejs library that concatenates classes
-import classNames from 'classnames';
+import classnames from 'classnames';
 // @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 // core components
-import GridContainer from 'components/Grid/GridContainer.js';
-import GridItem from 'components/Grid/GridItem.js';
-import Parallax from 'components/Parallax/Parallax.js';
+import GridContainer from '../../components/Grid/GridContainer.js';
+import GridItem from '../../components/Grid/GridItem.js';
+import Parallax from '../../components/Parallax/Parallax.js';
 // sections for this page
-import styles from 'assets/jss/material-kit-react/views/components.js';
+import styles from '../../assets/jss/material-kit-react/views/components.js';
 import CategoryDropdown from '../HomePage/CategoryDropdown';
 import Bills from '../HomePage/Bills';
 
-import image from 'assets/img/bg8.jpg';
+import image from '../../assets/img/bg8.jpg';
 
 const useStyles = makeStyles(styles);
 
@@ -36,7 +36,7 @@ export default function WatchListPage(props) {
           backgroundPosition: 'top center'
         }}
       ></div>
-      <Parallax image={require('assets/img/bg8.jpg')}>
+      <Parallax image={require('../../assets/img/bg8.jpg')}>
         <div className={classes.container}>
           <GridContainer>
             <GridItem>
@@ -50,7 +50,7 @@ export default function WatchListPage(props) {
         </div>
       </Parallax>
 
-      <div className={classNames(classes.main, classes.mainRaised)}>
+      <div className={classnames(classes.main, classes.mainRaised)}>
         <CategoryDropdown
           categories={props.categories}
           passCategory={setChildCategory}

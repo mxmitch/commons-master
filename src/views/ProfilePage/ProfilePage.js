@@ -1,16 +1,16 @@
 import React from 'react';
 // nodejs library that concatenates classes
-import classNames from 'classnames';
+import classnames from 'classnames';
 // @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 // core components
-import Footer from 'components/Footer/Footer.js';
-import GridContainer from 'components/Grid/GridContainer.js';
-import Parallax from 'components/Parallax/Parallax.js';
+import Footer from '../../components/Footer/Footer.js';
+import GridContainer from '../../components/Grid/GridContainer.js';
+import Parallax from '../../components/Parallax/Parallax.js';
 import Profile from './Profile';
-import GridItem from 'components/Grid/GridItem.js';
+import GridItem from '../../components/Grid/GridItem.js';
 
-import styles from 'assets/jss/material-kit-react/views/profilePage.js';
+import styles from '../../assets/jss/material-kit-react/views/profilePage.js';
 
 const useStyles = makeStyles(styles);
 
@@ -19,7 +19,7 @@ export default function ProfilePage(props) {
 
   return (
     <div>
-      <Parallax small filter image={require('assets/img/bg10.jpg')}>
+      <Parallax small filter image={require('../../assets/img/bg10.jpg')}>
         <div className={classes.container}>
           <GridContainer>
             <GridItem>
@@ -38,7 +38,7 @@ export default function ProfilePage(props) {
           </GridContainer>
         </div>
       </Parallax>
-      <div className={classNames(classes.main, classes.mainRaised)}>
+      <div className={classnames(classes.main, classes.mainRaised)}>
         {props.user && (
           <Profile
             user={props.user}
