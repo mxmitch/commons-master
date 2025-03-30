@@ -300,7 +300,7 @@ export default function BillCard(props) {
                     handleWatchSubmit();
                   }}
                 />
-                <Snackbar
+                {/* <Snackbar
                   anchorOrigin={{
                     vertical: 'bottom',
                     horizontal: 'center'
@@ -331,7 +331,7 @@ export default function BillCard(props) {
                       </>
                     }
                   />
-                </Snackbar>
+                </Snackbar> */}
               </IconButton>
             ) : (
               <Tooltip

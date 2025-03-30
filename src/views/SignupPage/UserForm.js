@@ -1,190 +1,102 @@
-import React, { useState, Fragment } from 'react';
-import Signup from './Signup';
-import Notifications from './Notifications';
-import Categories from './Categories';
-import Confirmation from './Confirmation';
-import Success from './Success';
+import React, { useState } from 'react';
 import axios from 'axios';
-import { Typography } from '@mui/material/';
+import { TextField, Checkbox, FormControlLabel, Button, Typography, Box } from '@mui/material';
 
-const UserForm = (props) => {
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
-  const [postalCode, setPostalCode] = useState('');
-  const [errors, setErrors] = useState('');
-  const [emailNotification, setEmailNotification] = useState(false);
-  const [smsNotification, setSmsNotification] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [step, setStep] = useState(1);
-  const [clicked, setClicked] = useState({});
+const UserForm = ({ handleLogin }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    username: '',
+    email: '',
+    password: '',
+    passwordConfirmation: '',
+    postalCode: '',
+    phoneNumber: '',
+    emailNotification: false,
+    smsNotification: false,
+  });
 
-  //Sets the category to clicked on categories component
-  const setThisOneClicked = (key) => {
-    setClicked((prev) => {
-      let state = { ...prev };
-      if (state[key]) {
-        delete state[key];
-      } else {
-        state[key] = true;
-      }
-      return state;
-    });
+  const [errors, setErrors] = useState([]);
+  const [submitted, setSubmitted] = useState(false);
+
+  // Handles form field updates dynamically
+  const handleChange = (event) => {
+    const { name, value, type, checked } = event.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
   };
 
-  //Handles login submit
-  const handleSubmit = async () => {
-    let user = {
-      name: name,
-      username: username,
-      email: email,
-      password: password,
-      password_confirmation: passwordConfirmation,
-      postal_code: postalCode,
-      email_notification: emailNotification,
-      sms_notification: smsNotification,
-      phone_number: phoneNumber,
-      categories: Object.keys(clicked),
+  // Handles form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevents page refresh on form submission
+
+    const user = {
+      username: formData.username,
+      email: formData.email,
+      password: formData.password,
+      phone_number: formData.phoneNumber,
+      postal_code: formData.postalCode,
+      email_notification: formData.emailNotification,
+      sms_notification: formData.smsNotification,
     };
-
+  
+    console.log("Sending user data:", user); // Debugging line
+  
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_COMMONS_API}/users`,
-        {
-          user,
-        }
-      );
-      if (response.data.status === 'created') {
-        props.handleLogin(response.data);
-        setStep(step + 1);
-      } else {
-        setErrors(response.data.errors);
-      }
+      const response = await axios.post("http://localhost:5000/api/auth/register", user);
+      console.log("Signup successful:", response.data);
     } catch (error) {
-      console.error(`Error occurred on Sign Up: ${error}`);
+      console.error("Signup error:", error.response?.data || error.message);
+      if (error.response && error.response.data) {
+        setErrors([error.response.data.error]);  // If backend sends an error message
+      } else {
+        setErrors([error.message]);  // General error
+      }
     }
   };
 
-  const handleErrors = () => {
-    return (
-      <div>
-        <ul>
-          {errors.map((error) => {
-            return (
-              <li key={error}>
-                <Typography variant="body1">{error}</Typography>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    );
-  };
+  return (
+    <Box sx={{ maxWidth: 400, mx: 'auto', mt: 4, p: 3, border: '1px solid #ddd', borderRadius: 2 }}>
+      <Typography variant="h4" align="center" gutterBottom>
+        Sign Up
+      </Typography>
+      
+      {errors.length > 0 && (
+        <Box sx={{ color: 'red', mb: 2 }}>
+          {errors.map((error, index) => (
+            <Typography key={index} variant="body2">
+              {error}
+            </Typography>
+          ))}
+        </Box>
+      )}
 
-  // Proceed to next step of the signup form
-  const nextStep = (justFinishedStep, data) => {
-    if (justFinishedStep === 1) {
-      if (data.name) {
-        setName(data.name);
-      }
-      if (data.username) {
-        setUsername(data.username);
-      }
-      if (data.email) {
-        setEmail(data.email);
-      }
-      if (data.password) {
-        setPassword(data.password);
-      }
-      if (data.passwordConfirmation) {
-        setPasswordConfirmation(data.passwordConfirmation);
-      }
-      if (data.postalCode) {
-        setPostalCode(data.postalCode);
-      }
-      setStep(step + 1);
-    }
-    if (justFinishedStep === 2) {
-      setSmsNotification(data.smsNotification);
-      setEmailNotification(data.emailNotification);
-      setPhoneNumber(data.phoneNumber);
-      setStep(step + 1);
-    }
-    if (justFinishedStep === 3) {
-      setStep(step + 1);
-    }
-    if (justFinishedStep === 4) {
-      handleSubmit();
-    }
-  };
+    <form onSubmit={handleSubmit}> {/* Add onSubmit here */}
+        <TextField fullWidth label="Full Name" name="name" value={formData.name} onChange={handleChange} margin="normal" required />
+        <TextField fullWidth label="Username" name="username" value={formData.username} onChange={handleChange} margin="normal" required />
+        <TextField fullWidth label="Email" name="email" type="email" value={formData.email} onChange={handleChange} margin="normal" required />
+        <TextField fullWidth label="Postal Code" name="postalCode" value={formData.postalCode} onChange={handleChange} margin="normal" required />
+        <TextField fullWidth label="Phone Number" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} margin="normal" />
 
-  // Go back to prev step
-  const prevStep = () => {
-    setStep(step - 1);
-  };
+        <TextField fullWidth label="Password" name="password" type="password" value={formData.password} onChange={handleChange} margin="normal" required />
+        <TextField fullWidth label="Confirm Password" name="passwordConfirmation" type="password" value={formData.passwordConfirmation} onChange={handleChange} margin="normal" required />
 
-  const renderSwitch = (param) => {
-    switch (param) {
-      case 1:
-        return (
-          <Signup
-            nextStep={nextStep}
-            name={name}
-            username={username}
-            email={email}
-            postalCode={postalCode}
-          />
-        );
-      case 2:
-        return (
-          <Notifications
-            nextStep={nextStep}
-            prevStep={prevStep}
-            emailNotification={emailNotification}
-            smsNotification={smsNotification}
-            phoneNumber={phoneNumber}
-          />
-        );
-      case 3:
-        return (
-          <Categories
-            categories={props.categories}
-            clicked={clicked}
-            setThisOneClicked={setThisOneClicked}
-            nextStep={nextStep}
-            prevStep={prevStep}
-          />
-        );
-      case 4:
-        return (
-          <Confirmation
-            errors={errors}
-            handleErrors={handleErrors}
-            prevStep={prevStep}
-            nextStep={nextStep}
-            details={{
-              name: name,
-              username: username,
-              email: email,
-              password: password,
-              password_confirmation: passwordConfirmation,
-              email_notification: emailNotification,
-              sms_notification: smsNotification,
-              phone_number: phoneNumber,
-              categories: Object.keys(clicked),
-            }}
-          />
-        );
-      case 5:
-        return <Success />;
-      default:
-        return <Signup nextStep={nextStep} />;
-    }
-  };
+        <FormControlLabel
+          control={<Checkbox name="emailNotification" checked={formData.emailNotification} onChange={handleChange} />}
+          label="Receive email notifications"
+        />
+        <FormControlLabel
+          control={<Checkbox name="smsNotification" checked={formData.smsNotification} onChange={handleChange} />}
+          label="Receive SMS notifications"
+        />
 
-  return <Fragment>{renderSwitch(step)}</Fragment>;
+        <Button type="submit" fullWidth variant="contained" sx={{ mt: 2 }}>
+          Register
+        </Button>
+      </form>
+    </Box>
+  );
 };
 
 export default UserForm;

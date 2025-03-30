@@ -1,36 +1,65 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link as RouterLink } from 'react-router-dom';
-
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
-import { makeStyles } from '@mui/styles';
 import PersonIcon from '@mui/icons-material/Person';
 import { Typography } from '@mui/material/';
+import { makeStyles } from '@mui/styles';
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(4),
+    alignItems: 'center',
+    padding: theme.spacing(2),
+    textAlign: 'center'
+  },
+  avatar: {
+    margin: '0 auto',
+    marginBottom: theme.spacing(2),
+    width: '120px',
+    height: '120px',
+    backgroundColor: '#29c0a8'
+  },
+  form: {
+    width: '100%',
+    marginTop: theme.spacing(1),
+    textAlign: 'center'
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+    backgroundColor: '#29c0a8'
+  },
+  accountCircle: {
+    width: '100px',
+    height: '100px',
+    color: 'white'
+  }
+}));
 
 const Login = (props) => {
+  const classes = useStyles();
+  const navigate = useNavigate(); // React Router v6 navigation
   const [state, setState] = useState({
     email: '',
     password: '',
-    errors: {
-      email: 'Email is not valid.',
-      password: 'Password must be 5 characters long!'
-    },
+    errors: { email: '', password: '' },
     invalid: ''
   });
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     if (props.loggedInStatus) {
-      redirect('/');
+      navigate('/');
     }
-  });
+  }, [props.loggedInStatus, navigate]);
 
   const handleChange = (event) => {
-    const { name, value } = event;
+    const { name, value } = event.target; // Fix: Use event.target correctly
     let errors = state.errors;
 
     switch (name) {
@@ -43,7 +72,7 @@ const Login = (props) => {
       case 'password':
         errors.password =
           value.length === 0 || value.length < 5
-            ? 'Password must be 5 characters long!'
+            ? 'Password must be at least 5 characters long!'
             : '';
         break;
       default:
@@ -58,14 +87,11 @@ const Login = (props) => {
   };
 
   const validEmailRegex = RegExp(
-    // eslint-disable-next-line
     /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
   );
 
   const validateForm = (errors) => {
-    let valid = true;
-    Object.values(errors).forEach((val) => val.length > 0 && (valid = false));
-    return valid;
+    return Object.values(errors).every((val) => val.length === 0);
   };
 
   const { email, password, errors, invalid } = state;
@@ -74,71 +100,23 @@ const Login = (props) => {
     event.preventDefault();
     setSubmitted(true);
 
-    let user = {
-      email: email,
-      password: password
-    };
-
-    if (validateForm(state.errors)) {
-      try {
+    try {
         const response = await axios.post(
-          `${process.env.REACT_APP_COMMONS_API}/login`,
-          { user }
+            "http://localhost:5000/api/auth/login", // Ensure this matches your backend route
+            { email, password },
+            { withCredentials: true } // If using sessions/cookies
         );
+
         props.handleLogin(response.data);
-        redirect('/');
-      } catch (error) {
+        props.history.push('/');
+    } catch (error) {
+        console.error("Login error:", error.response?.data || error.message);
         setState((prevState) => ({
-          ...prevState,
-          invalid: `Email or password is not valid.`
+            ...prevState,
+            invalid: `Email or password is not valid.`
         }));
-        console.error(`Error occurred on handleSubmit: ${error}`);
-      }
     }
-  };
-
-  const redirect = (uri) => {
-    props.history.push(uri);
-  };
-
-  const useStyles = makeStyles((theme) => ({
-    paper: {
-      zIndex: 1000,
-      marginTop: theme.spacing(4),
-      marginBottom: theme.spacing(4),
-      alignItems: 'center',
-      border: 5,
-      padding: theme.spacing(2),
-      textAlign: 'center'
-    },
-    avatar: {
-      zIndex: 1000,
-      margin: '0 auto',
-      marginBottom: theme.spacing(2),
-      width: '120px',
-      height: '120px',
-      backgroundColor: '#29c0a8'
-    },
-    form: {
-      zIndex: 1000,
-      width: '100%', // Fix IE 11 issue.
-      marginTop: theme.spacing(1),
-      textAlign: 'center'
-    },
-    submit: {
-      margin: theme.spacing(3, 0, 2),
-      backgroundColor: '#29c0a8'
-    },
-    accountCircle: {
-      width: '100px',
-      height: '100px',
-      color: 'white'
-    },
-    button: {
-      margin: '1em'
-    }
-  }));
-  const classes = useStyles();
+};
 
   return (
     <div className={classes.paper}>
@@ -157,12 +135,11 @@ const Login = (props) => {
           name="email"
           autoComplete="email"
           autoFocus
-          value={state.email}
-          onChange={(e) => handleChange(e.target)}
+          value={email}
+          onChange={handleChange} // Fix: No need for (e) => handleChange(e.target)
         />
-        {submitted && errors.email.length > 0 && (
-          <span className="error">{errors.email}</span>
-        )}
+        {submitted && errors.email && <span className="error">{errors.email}</span>}
+        
         <TextField
           variant="outlined"
           margin="normal"
@@ -173,14 +150,12 @@ const Login = (props) => {
           type="password"
           id="password"
           autoComplete="current-password"
-          onChange={(e) => handleChange(e.target)}
+          value={password}
+          onChange={handleChange}
         />
-        {submitted && errors.password.length > 0 && (
-          <span className="error">{errors.password}</span>
-        )}
-        {submitted && invalid.length > 0 && (
-          <span className="error">{invalid}</span>
-        )}
+        {submitted && errors.password && <span className="error">{errors.password}</span>}
+        {submitted && invalid && <span className="error">{invalid}</span>}
+        
         <Button
           type="submit"
           fullWidth
@@ -190,15 +165,11 @@ const Login = (props) => {
         >
           LOGIN
         </Button>
-        <Grid container justify="center">
+        
+        <Grid container justifyContent="center">
           <Grid item>
-            <Link
-              href="#"
-              variant="body2"
-              component={RouterLink}
-              to="/signup-page"
-            >
-              {'Not a member? Sign up'}
+            <Link component={RouterLink} to="/signup-page" variant="body2">
+              {"Not a member? Sign up"}
             </Link>
           </Grid>
         </Grid>
