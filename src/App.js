@@ -17,14 +17,12 @@ const App = (props) => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [bills, setBills] = useState([]);
   const [categories, setCategories] = useState([]);
-  const { loading, updateLoadingState } = useLoading(
-    bills.length === 0 ? true : false
-  );
+  const { loading, updateLoadingState } = useLoading(bills.length === 0);
 
   // Loads initial page state and fetches bills/categories
   useEffect(() => {
-    loginStatus();
-    fetchBills();
+    loginStatus();  // Check login status
+    fetchBills();   // Fetch bills and categories
   }, []);
 
   // Fetches bills from the backend API
@@ -36,27 +34,24 @@ const App = (props) => {
         },
       });
 
-      const sortedBills = response.data.bills.sort(
-        (a, b) => new Date(b.introduced_date) - new Date(a.introduced_date)
-      );
-
-      setBills(sortedBills);
+      setBills(response.data.bills);
       setCategories(response.data.categories);
-      updateLoadingState(false);
+      updateLoadingState(false);  // Turn off loading after data is fetched
     } catch (error) {
       console.error("Error occurred on fetchBills:", error);
+      updateLoadingState(false);  // Turn off loading if there's an error
     }
   };
 
   // Check login status and validate JWT
   const loginStatus = async () => {
-    updateLoadingState(true);
+    updateLoadingState(true);  // Start loading while checking login status
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         setLoggedIn(false);
         setUser(null);
-        updateLoadingState(false);
+        updateLoadingState(false);  // End loading if no token
         return;
       }
 
@@ -66,7 +61,7 @@ const App = (props) => {
         },
       });
 
-      if (response.data.loggedIn) {
+      if (response.data.loggedIn === "true") {
         setLoggedIn(true);
         setUser(response.data.user);
       } else {
@@ -78,43 +73,13 @@ const App = (props) => {
       setLoggedIn(false);
       setUser(null);
     } finally {
-      updateLoadingState(false);
+      updateLoadingState(false);  // End loading once login check is complete
     }
-  };
-
-  const handleProfileUpdate = async (user) => {
-    try {
-      const res = await axios.put(
-        `${process.env.REACT_APP_COMMONS_API}/users/${user.id}`,
-        {
-          user,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Send JWT token for authentication
-          },
-        }
-      );
-      if (res.data.status === 200) {
-        setUser((prev) => ({ ...res.data.user, user_bills: prev.user_bills }));
-      } else {
-        console.error(`Error occurred on handleProfileUpdate: ${res.data.errors}`);
-      }
-    } catch (error) {
-      console.error(`Error occurred on handleProfileUpdate: ${error}`);
-    }
-  };
-
-  const updateWatchList = (user_bills) => {
-    setUser((prev) => ({
-      ...prev,
-      user_bills,
-    }));
   };
 
   // Login/logout handlers
   const handleLogin = (data) => {
-    localStorage.setItem("token", data.token); // Save the token to localStorage
+    localStorage.setItem("token", data.token);  // Save the token to localStorage
     setUser(data.user);
     setLoggedIn(true);
   };
@@ -122,35 +87,26 @@ const App = (props) => {
   const handleLogout = async () => {
     updateLoadingState(true);
     try {
-      // Optionally, inform the backend that the user is logging out (e.g., invalidating the token)
       await axios.delete(`${process.env.REACT_APP_COMMONS_API}/api/auth/logout`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`, // Send the token for logout
         },
       });
 
-      // Remove the token from localStorage
       localStorage.removeItem("token");
-
-      // Reset user state after successful logout
       setUser(null);
       setLoggedIn(false);
-
-      // Redirect user to home page or login page
-      props.history.push("/");
-
-      // Stop loading state
       updateLoadingState(false);
     } catch (error) {
-      updateLoadingState(false);
       console.error(`Error occurred during logout: ${error}`);
+      updateLoadingState(false);
     }
   };
 
   return (
     <div>
       <Router>
-        {loading && (
+        {loading ? (
           <div
             style={{
               minHeight: "100vh",
@@ -160,10 +116,9 @@ const App = (props) => {
               justifyContent: "center",
             }}
           >
-            <LoadingSpinner />
+            <LoadingSpinner />  {/* Show the loading spinner until bills and login data is ready */}
           </div>
-        )}
-        {!loading && (
+        ) : (
           <Fragment>
             <Header
               color="transparent"
@@ -188,7 +143,6 @@ const App = (props) => {
                     handleLogout={handleLogout}
                     loggedInStatus={loggedIn}
                     user={user}
-                    updateWatchList={updateWatchList}
                   />
                 }
               />
@@ -198,7 +152,6 @@ const App = (props) => {
                   <LoginPage
                     handleLogin={handleLogin}
                     loggedInStatus={loggedIn}
-                    history={props.history}
                   />
                 }
               />
@@ -221,7 +174,6 @@ const App = (props) => {
                     categories={categories}
                     handleLogin={handleLogin}
                     loggedInStatus={loggedIn}
-                    updateWatchList={updateWatchList}
                   />
                 }
               />
@@ -230,8 +182,6 @@ const App = (props) => {
                 element={
                   <ProfilePage
                     user={user}
-                    handleProfileUpdate={handleProfileUpdate}
-                    categories={categories}
                     loggedInStatus={loggedIn}
                   />
                 }

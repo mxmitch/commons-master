@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Profile = ({ categories, user, handleProfileUpdate }) => {
   const classes = useStyles();
-
+  
   return (
     <div className={classes.root}>
       <Grid container justify="center" alignItems="center">
@@ -47,7 +47,7 @@ const Profile = ({ categories, user, handleProfileUpdate }) => {
             <PersonIcon className={classes.personIcon} />
           </Avatar>
           <Typography variant="h5" className={classes.profileName}>
-            {user.name}
+            {user.username}
           </Typography>
         </Grid>
 

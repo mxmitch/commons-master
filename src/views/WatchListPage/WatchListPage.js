@@ -1,41 +1,34 @@
 import React, { useState } from 'react';
-// nodejs library that concatenates classes
 import classnames from 'classnames';
-// @material-ui/core components
 import { makeStyles } from '@mui/styles';
-// core components
 import GridContainer from '../../components/Grid/GridContainer.js';
 import GridItem from '../../components/Grid/GridItem.js';
 import Parallax from '../../components/Parallax/Parallax.js';
-// sections for this page
-import styles from '../../assets/jss/material-kit-react/views/components.js';
 import CategoryDropdown from '../HomePage/CategoryDropdown';
 import Bills from '../HomePage/Bills';
-
-import image from '../../assets/img/bg8.jpg';
+import styles from '../../assets/jss/material-kit-react/views/components.js';
 
 const useStyles = makeStyles(styles);
 
-export default function WatchListPage(props) {
-  const classes = useStyles();
-  // const { ...rest } = props;
+const imageStyle = {
+  backgroundImage: 'url(' + require('../../assets/img/bg8.jpg') + ')',
+  backgroundSize: 'cover',
+  backgroundPosition: 'top center',
+};
 
+export default function WatchListPage({ bills, user, categories, updateWatchList }) {
+  const classes = useStyles();
   const [childCategory, setChildCategory] = useState(0);
 
-  const bills = props.bills.filter((bill) => {
-    return props.user.user_bills.includes(bill.id);
-  });
+  // Safeguard: ensure user.user_bills is an array before filtering bills
+  const userBills = user?.user_bills || []; // Default to empty array if undefined or null
+
+  // Filter bills for the current user's watch list
+  const filteredBills = bills.filter((bill) => userBills.includes(bill.id));
 
   return (
     <div>
-      <div
-        className={classes.pageHeader}
-        style={{
-          backgroundImage: 'url(' + image + ')',
-          backgroundSize: 'cover',
-          backgroundPosition: 'top center'
-        }}
-      ></div>
+      <div className={classes.pageHeader} style={imageStyle}></div>
       <Parallax image={require('../../assets/img/bg8.jpg')}>
         <div className={classes.container}>
           <GridContainer>
@@ -51,16 +44,13 @@ export default function WatchListPage(props) {
       </Parallax>
 
       <div className={classnames(classes.main, classes.mainRaised)}>
-        <CategoryDropdown
-          categories={props.categories}
-          passCategory={setChildCategory}
-        />
-        {props.user && (
+        <CategoryDropdown categories={categories} passCategory={setChildCategory} />
+        {user && (
           <Bills
-            user={props.user}
-            bills={bills}
+            user={user}
+            bills={filteredBills}
             childCategory={childCategory}
-            updateWatchList={props.updateWatchList}
+            updateWatchList={updateWatchList}
           />
         )}
       </div>

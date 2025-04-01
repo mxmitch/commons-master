@@ -1,20 +1,19 @@
 import React from 'react';
-// nodejs library that concatenates classes
 import classnames from 'classnames';
-// @material-ui/core components
 import { makeStyles } from '@mui/styles';
-// core components
+
+// Core components
 import Footer from '../../components/Footer/Footer.js';
 import GridContainer from '../../components/Grid/GridContainer.js';
 import Parallax from '../../components/Parallax/Parallax.js';
-import Profile from './Profile';
+import Profile from './Profile'; // Renamed import to avoid confusion
 import GridItem from '../../components/Grid/GridItem.js';
 
 import styles from '../../assets/jss/material-kit-react/views/profilePage.js';
 
 const useStyles = makeStyles(styles);
 
-export default function ProfilePage(props) {
+export default function ProfilePage({ user, categories, handleProfileUpdate }) {
   const classes = useStyles();
 
   return (
@@ -28,7 +27,7 @@ export default function ProfilePage(props) {
                   style={{
                     textAlign: 'center',
                     fontWeight: 900,
-                    color: '#FFFF'
+                    color: '#FFFF',
                   }}
                 >
                   My Profile
@@ -38,15 +37,19 @@ export default function ProfilePage(props) {
           </GridContainer>
         </div>
       </Parallax>
+
       <div className={classnames(classes.main, classes.mainRaised)}>
-        {props.user && (
+        {user ? (
           <Profile
-            user={props.user}
-            categories={props.categories}
-            handleProfileUpdate={props.handleProfileUpdate}
+            user={{ ...user, user_categories: user.user_categories || [] }} // Ensure user_categories is always an array
+            categories={categories}
+            handleProfileUpdate={handleProfileUpdate}
           />
+        ) : (
+          <p style={{ textAlign: 'center', padding: '20px' }}>Loading profile...</p>
         )}
       </div>
+
       <Footer />
     </div>
   );

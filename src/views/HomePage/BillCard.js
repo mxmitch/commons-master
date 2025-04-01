@@ -47,16 +47,7 @@ const useStyles = makeStyles((theme) => ({
     height: '75px',
     color: '#FFF',
     fontWeight: 900,
-    boxShadow: '10px 17px 24px -13px rgba(0,0,0,0.5)',
     margin: theme.spacing(2),
-    transition: 'all 0.5s ease-in-out',
-    '&:hover,&:focus': {
-      color: '#10021a',
-      background: '#fa7c70',
-      boxShadow: '0 14px 20px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)',
-      transform: 'scale(1.05)',
-      transition: 'all 0.3s ease-in-out'
-    }
   },
   billText: {
     backgroundColor: grey[200],
@@ -90,6 +81,8 @@ export default function BillCard(props) {
   const [color, setColor] = useState('');  
   const [open, setOpen] = useState(false);
 
+  // console.log(props.bill);
+
   useEffect(() => {
     props.user &&
     props.user.user_bills &&
@@ -119,16 +112,14 @@ export default function BillCard(props) {
   const getEventsForBill = async (bill_id) => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_COMMONS_API}/events/${bill_id}`,
-        {
-          bill_id
-        }
+        `${process.env.REACT_APP_COMMONS_API}/api/events/${bill_id}`
       );
-      setEvents(response.data.events);
+      setEvents(response.data);  // Set the events in state
     } catch (error) {
-      console.error(`Error occurred on getEventsForBill: ${props.bill.code}`);
+      console.error('Error fetching events:', error);
     }
   };
+  
 
   const handleClose = (reason) => {
     if (reason === 'clickaway') {
@@ -139,7 +130,13 @@ export default function BillCard(props) {
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
-    getEventsForBill(props.bill.id);
+    const billId = props.bill.bill_number;
+    if (billId) {
+      console.log('Fetching events for bill ID:', billId); // Log the bill_id
+      getEventsForBill(billId); // Call getEventsForBill if billId is valid
+    } else {
+      console.error('Bill ID is missing or undefined.');
+    }
   };
 
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -149,7 +146,6 @@ export default function BillCard(props) {
   const eventCards =
     Array.isArray(events) &&
     events.map((event) => {
-      const publication_date = new Date(event.publication_date + ' ');
       return (
         <CardContent key={event.id}>
           <Grid container justify="center">
@@ -157,7 +153,7 @@ export default function BillCard(props) {
             <Grid item xs={4} sm={3} md={3} lg={3} xl={3}>
               <Typography body>
                 <strong>
-                  {publication_date.toLocaleDateString('en-US', options)}
+                  {event.publication_date}
                 </strong>
               </Typography>
             </Grid>
@@ -176,7 +172,7 @@ export default function BillCard(props) {
           <Grid item xs={6} sm={3} md={2} lg={2} xl={1} spacing={3} className={classes.status}>
             <Tooltip title="View bill page on parliament's website." placement="right">
               <Button
-                href={props.bill.page_url}
+                href={`https://www.parl.ca/legisinfo/en/bill/${props.bill.parl_session_code}/${props.bill.bill_number}`}
                 variant="contained"
                 className={classes.avatar}
                 target="_blank"
@@ -185,7 +181,7 @@ export default function BillCard(props) {
                 {props.bill.bill_number}
               </Button>
             </Tooltip>
-            {props.bill.passed_house_first_reading_date ? (
+            {props.bill.received_royal_assent_date ? (
               <Tooltip title="This bill has been passed." placement="bottom">
                 <Chip
                   label="Passed"
@@ -212,9 +208,7 @@ export default function BillCard(props) {
               <strong>{props.bill.long_title_en}</strong>
             </Typography>
             <Typography style={{ marginBottom: '16px' }}>
-              {passed_house_first_reading_date
-                ? 'Passed first reading on ' + passed_house_first_reading_date.toLocaleDateString('en-US', options)
-                : 'First reading date not available.'}
+              Current Status: {props.bill.latest_event_en}
             </Typography>
             <Grid container direction="row">
               <Grid item xs={12}>
@@ -224,7 +218,7 @@ export default function BillCard(props) {
                   component="p"
                   style={{ marginBottom: '24px' }}
                 >
-                  {props.bill.description || 'No description available.'}
+                  Sponsor: {props.bill.sponsor_en || 'No sponsor details available.'}
                 </Typography>
                 <Grid container xs={12} spacing={2} style={{ display: 'flex' }}>
                   <Grid item>
@@ -233,51 +227,15 @@ export default function BillCard(props) {
                       placement="right"
                     >
                       <Button
-                        href={props.bill.full_text_url}
+                        href={`https://www.parl.ca/legisinfo/en/bill/${props.bill.parl_session_code}/${props.bill.bill_number}`}
                         target="_blank"
-                        variant="contained"
+                        variant="primary"
                         className={classes.billText}
                       >
                         <LibraryBooksIcon style={{ marginRight: '8px' }} />
-                        Full Text
+                        More Info
                       </Button>
                     </Tooltip>
-                  </Grid>
-                  <Grid item>
-                    {props.bill.summary_url ? (
-                      <Tooltip
-                        title="View the summary text of this bill on parliament's website."
-                        placement="right"
-                      >
-                        <Button
-                          href={props.bill.summary_url}
-                          target="_blank"
-                          variant="contained"
-                          className={classes.billText}
-                        >
-                          <AccountBalanceIcon style={{ marginRight: '8px' }} />
-                          Summary
-                        </Button>
-                      </Tooltip>
-                    ) : (
-                      <Tooltip
-                        title="Summary not available."
-                        placement="right"
-                      >
-                        <div>
-                          <Button
-                            disabled
-                            variant="contained"
-                            className={classes.billText}
-                          >
-                            <AccountBalanceIcon
-                              style={{ marginRight: '8px' }}
-                            />
-                            Summary
-                          </Button>
-                        </div>
-                      </Tooltip>
-                    )}
                   </Grid>
                 </Grid>
               </Grid>

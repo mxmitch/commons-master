@@ -1,8 +1,6 @@
 import React, { useState, useEffect, Fragment } from 'react';
-
 import { makeStyles } from '@mui/styles';
 import ChipsArray from '../SignupPage/ChipsArray';
-
 import mapUserFieldToLabel from '../../helpers/mapUserFieldToLabel';
 import validationFunctions from '../../helpers/validationFunctions';
 
@@ -10,6 +8,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import Typography from '@mui/material/Typography';  // Import Typography for read-only mode
 
 const ProfileText = ({ user, handleProfileUpdate, categories }) => {
   const [editStatus, setEditStatus] = useState(false);
@@ -20,9 +19,7 @@ const ProfileText = ({ user, handleProfileUpdate, categories }) => {
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [phoneNumber, setPhoneNumber] = useState(user.phone_number || '');
   const [postalCode, setPostalCode] = useState(user.postal_code || '');
-  const [emailNotification, setEmailNotification] = useState(
-    user.email_notification
-  );
+  const [emailNotification, setEmailNotification] = useState(user.email_notification);
   const [smsNotification, setSmsNotification] = useState(user.sms_notification);
   const [formErrors, setFormErrors] = useState({});
 
@@ -34,15 +31,7 @@ const ProfileText = ({ user, handleProfileUpdate, categories }) => {
 
   useEffect(() => {
     validateForm();
-  }, [
-    name,
-    username,
-    email,
-    password,
-    passwordConfirmation,
-    phoneNumber,
-    postalCode,
-  ]);
+  }, [name, username, email, password, passwordConfirmation, phoneNumber, postalCode]);
 
   const useStyles = makeStyles((theme) => ({
     profileTable: {
@@ -57,6 +46,7 @@ const ProfileText = ({ user, handleProfileUpdate, categories }) => {
       marginRight: theme.spacing(2),
     },
   }));
+
   const classes = useStyles();
 
   const setThisOneClicked = (key) => {
@@ -90,19 +80,19 @@ const ProfileText = ({ user, handleProfileUpdate, categories }) => {
 
     for (const key in formValues) {
       let problem = '';
-
+    
+      const value = formValues[key] || '';
+    
       if (key === 'passwordConfirmation') {
-        problem = validationFunctions[key](
-          formValues[key],
-          formValues.password
-        );
+        problem = validationFunctions[key](value, formValues.password || '');
       } else if (key === 'password') {
-        problem = validationFunctions[`${key}Update`](formValues[key]);
+        problem = validationFunctions[`${key}Update`](value);
       } else {
-        problem = validationFunctions[key](formValues[key]);
+        problem = validationFunctions[key](value);
       }
-
+    
       newValidity[key] = problem;
+    
       if (problem && problem.length) {
         isValid = false;
       }
@@ -113,7 +103,6 @@ const ProfileText = ({ user, handleProfileUpdate, categories }) => {
   };
 
   const saveForm = () => {
-    // Need snake case because Ruby API uses snake case
     const formValues = {
       id: user.id,
       name: name,
@@ -141,125 +130,134 @@ const ProfileText = ({ user, handleProfileUpdate, categories }) => {
 
   return (
     <form onSubmit={(e) => e.preventDefault()}>
-      <TextField
-        variant="outlined"
-        margin="normal"
-        error={formErrors.name && formErrors.name.length > 0}
-        helperText={formErrors.name}
-        required
-        fullWidth
-        id="name"
-        label={mapUserFieldToLabel('name')}
-        name={mapUserFieldToLabel('name')}
-        InputProps={{
-          readOnly: !editStatus,
-        }}
-        defaultValue={name}
-        onChange={(e) => {
-          setName(e.target.value);
-        }}
-      />
-      <TextField
-        variant="outlined"
-        margin="normal"
-        error={formErrors.username && formErrors.username.length > 0}
-        helperText={formErrors.username}
-        required
-        fullWidth
-        id="username"
-        label={mapUserFieldToLabel('username')}
-        name={mapUserFieldToLabel('username')}
-        InputProps={{
-          readOnly: !editStatus,
-        }}
-        defaultValue={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <TextField
-        variant="outlined"
-        margin="normal"
-        error={formErrors.email && formErrors.email.length > 0}
-        helperText={formErrors.email}
-        required
-        fullWidth
-        id="email"
-        label={mapUserFieldToLabel('email')}
-        name={mapUserFieldToLabel('email')}
-        InputProps={{
-          readOnly: !editStatus,
-        }}
-        defaultValue={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      {editStatus && (
-        <Fragment>
+      {editStatus ? (
+        <>
           <TextField
             variant="outlined"
-            type="password"
             margin="normal"
-            error={formErrors.password && formErrors.password.length > 0}
-            helperText={formErrors.password}
+            error={formErrors.name && formErrors.name.length > 0}
+            helperText={formErrors.name}
+            required
             fullWidth
-            id="password"
-            label={mapUserFieldToLabel('password_digest')}
-            name={mapUserFieldToLabel('password_digest')}
+            id="name"
+            label={mapUserFieldToLabel('name')}
+            name={mapUserFieldToLabel('name')}
             InputProps={{
               readOnly: !editStatus,
             }}
-            defaultValue=""
-            onChange={(e) => setPassword(e.target.value)}
+            defaultValue={name}
+            onChange={(e) => setName(e.target.value)}
           />
           <TextField
             variant="outlined"
-            type="password"
             margin="normal"
-            error={
-              formErrors.passwordConfirmation &&
-              formErrors.passwordConfirmation.length > 0
-            }
-            helperText={formErrors.passwordConfirmation}
+            error={formErrors.username && formErrors.username.length > 0}
+            helperText={formErrors.username}
+            required
             fullWidth
-            id="password_confirmation"
-            label="Confirm password"
-            name="Confirm password"
+            id="username"
+            label={mapUserFieldToLabel('username')}
+            name={mapUserFieldToLabel('username')}
             InputProps={{
               readOnly: !editStatus,
             }}
-            defaultValue=""
-            onChange={(e) => setPasswordConfirmation(e.target.value)}
+            defaultValue={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
-        </Fragment>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            error={formErrors.email && formErrors.email.length > 0}
+            helperText={formErrors.email}
+            required
+            fullWidth
+            id="email"
+            label={mapUserFieldToLabel('email')}
+            name={mapUserFieldToLabel('email')}
+            InputProps={{
+              readOnly: !editStatus,
+            }}
+            defaultValue={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          {editStatus && (
+            <>
+              <TextField
+                variant="outlined"
+                type="password"
+                margin="normal"
+                error={formErrors.password && formErrors.password.length > 0}
+                helperText={formErrors.password}
+                fullWidth
+                id="password"
+                label={mapUserFieldToLabel('password_digest')}
+                name={mapUserFieldToLabel('password_digest')}
+                InputProps={{
+                  readOnly: !editStatus,
+                }}
+                defaultValue=""
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <TextField
+                variant="outlined"
+                type="password"
+                margin="normal"
+                error={formErrors.passwordConfirmation && formErrors.passwordConfirmation.length > 0}
+                helperText={formErrors.passwordConfirmation}
+                fullWidth
+                id="password_confirmation"
+                label="Confirm password"
+                name="Confirm password"
+                InputProps={{
+                  readOnly: !editStatus,
+                }}
+                defaultValue=""
+                onChange={(e) => setPasswordConfirmation(e.target.value)}
+              />
+            </>
+          )}
+          <TextField
+            variant="outlined"
+            margin="normal"
+            error={formErrors.phoneNumber && formErrors.phoneNumber.length > 0}
+            helperText={formErrors.phoneNumber}
+            fullWidth
+            id="phone_number"
+            label={mapUserFieldToLabel('phone_number')}
+            name={mapUserFieldToLabel('phone_number')}
+            InputProps={{
+              readOnly: !editStatus,
+            }}
+            defaultValue={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            error={formErrors.postalCode && formErrors.postalCode.length > 0}
+            helperText={formErrors.postalCode}
+            fullWidth
+            id="postal_code"
+            label={mapUserFieldToLabel('postal_code')}
+            name={mapUserFieldToLabel('postal_code')}
+            InputProps={{
+              readOnly: !editStatus,
+            }}
+            defaultValue={postalCode}
+            onChange={(e) => setPostalCode(e.target.value)}
+          />
+        </>
+      ) : (
+        <>
+          <Typography variant="h6">{username}</Typography>
+          <Typography variant="body1">Username: {username}</Typography>
+          <Typography variant="body1">{email}</Typography>
+          <Typography variant="body1">{phoneNumber}</Typography>
+          <Typography variant="body1">{postalCode}</Typography>
+          <Typography variant="body1">{emailNotification ? 'Email Notifications: Yes' : 'Email Notifications: No'}</Typography>
+          <Typography variant="body1">{smsNotification ? 'SMS Notifications: Yes' : 'SMS Notifications: No'}</Typography>
+        </>
       )}
-      <TextField
-        variant="outlined"
-        margin="normal"
-        error={formErrors.phoneNumber && formErrors.phoneNumber.length > 0}
-        helperText={formErrors.phoneNumber}
-        fullWidth
-        id="phone_number"
-        label={mapUserFieldToLabel('phone_number')}
-        name={mapUserFieldToLabel('phone_number')}
-        InputProps={{
-          readOnly: !editStatus,
-        }}
-        defaultValue={phoneNumber}
-        onChange={(e) => setPhoneNumber(e.target.value)}
-      />
-      <TextField
-        variant="outlined"
-        margin="normal"
-        error={formErrors.postalCode && formErrors.postalCode.length > 0}
-        helperText={formErrors.postalCode}
-        fullWidth
-        id="postal_code"
-        label={mapUserFieldToLabel('postal_code')}
-        name={mapUserFieldToLabel('postal_code')}
-        InputProps={{
-          readOnly: !editStatus,
-        }}
-        defaultValue={postalCode}
-        onChange={(e) => setPostalCode(e.target.value)}
-      />
 
       <FormControlLabel
         control={
@@ -284,17 +282,17 @@ const ProfileText = ({ user, handleProfileUpdate, categories }) => {
         label={mapUserFieldToLabel('sms_notification')}
       />
 
-      <ChipsArray
+      {/* <ChipsArray
         user={user}
         categories={categories}
         clicked={clicked}
         setThisOneClicked={editStatus ? setThisOneClicked : () => {}}
         editStatus={editStatus}
-      />
+      /> */}
 
       <div className={classes.buttons}>
         {editStatus ? (
-          <Fragment>
+          <>
             <Button
               type="submit"
               variant="contained"
@@ -303,13 +301,19 @@ const ProfileText = ({ user, handleProfileUpdate, categories }) => {
             >
               Save
             </Button>
-            <Button variant="contained" onClick={(e) => setEditStatus(false)}>
+            <Button
+              variant="outlined"
+              onClick={() => setEditStatus(false)}
+            >
               Cancel
             </Button>
-          </Fragment>
+          </>
         ) : (
-          <Button variant="contained" onClick={(e) => setEditStatus(true)}>
-            Edit
+          <Button
+            variant="outlined"
+            onClick={() => setEditStatus(true)}
+          >
+            Edit Profile
           </Button>
         )}
       </div>

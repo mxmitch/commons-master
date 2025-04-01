@@ -159,12 +159,16 @@ export default function FindMyMp({ user }) {
     setPostalCode((prev) => prev.replace(/ /g, ''));
     updateLoadingState(true);
 
+    console.log(strippedPostalCode)
+
     if (validate()) {
       try {
         const response = await axios.get(
-          `https://cors-anywhere.herokuapp.com/https://represent.opennorth.ca/postcodes/${strippedPostalCode}?sets=federal-electoral-districts`,
-          { withCredentials: false }
-        );
+        `https://cors-anywhere.herokuapp.com/https://represent.opennorth.ca/postcodes/${strippedPostalCode}/?sets=federal-electoral-districts`, {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+          }
+      });
         setMpName(response.data.representatives_centroid[0].name);
         setMpParty(response.data.representatives_centroid[0].party_name);
         setMpPhoto(response.data.representatives_centroid[0].photo_url);
