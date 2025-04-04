@@ -16,12 +16,16 @@ export default function Home(props) {
   const [childCategory, setChildCategory] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // Fetch bills and categories when the component mounts
+  // Check for availability of props.bills and props.categories
   useEffect(() => {
     if (props.bills && props.categories) {
       setLoading(false);
     }
   }, [props.bills, props.categories]);
+
+  // Ensure categories are passed correctly to Bills component, fallback if not available
+  const categories = props.categories || []; // Default to an empty array if not provided
+  const bills = props.bills || []; // Default to an empty array if not provided
 
   return (
     <div>
@@ -50,15 +54,16 @@ export default function Home(props) {
         ) : (
           <>
             <CategoryDropdown
-              categories={props.categories}
+              categories={categories}
               passCategory={setChildCategory}
             />
             <Bills
               user={props.user}
-              bills={props.bills}
+              bills={bills}
               childCategory={childCategory}
               setUser={props.setUser}
               updateWatchList={props.updateWatchList}
+              categories={categories} // Ensure categories are passed to Bills
             />
           </>
         )}

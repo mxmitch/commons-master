@@ -28,7 +28,8 @@ import axios from 'axios';
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
-    marginBottom: '16px'
+    marginBottom: '16px',
+    height: '100%',  // Ensure it takes up full height within its container
   },
   expand: {
     transform: 'rotate(0deg)',

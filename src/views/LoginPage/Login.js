@@ -101,81 +101,90 @@ const Login = (props) => {
     setSubmitted(true);
 
     try {
-        const response = await axios.post(
-            "http://localhost:5000/api/auth/login", // Ensure this matches your backend route
-            { email, password },
-            { withCredentials: true } // If using sessions/cookies
-        );
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login", // Ensure this matches your backend route
+        { email, password },
+        { withCredentials: true } // If using sessions/cookies
+      );
 
-        props.handleLogin(response.data);
-        props.history.push('/');
+      // Store the token in localStorage
+      const { token } = response.data;
+      localStorage.setItem("authToken", token);  // Save token in localStorage
+
+      // Pass the token and user info to the parent component or update local state
+      props.handleLogin(response.data);
+
+      // Redirect to the homepage or protected route
+      navigate("/");
+
     } catch (error) {
-        console.error("Login error:", error.response?.data || error.message);
-        setState((prevState) => ({
-            ...prevState,
-            invalid: `Email or password is not valid.`
-        }));
+      console.error("Login error:", error.response?.data || error.message);
+      setState((prevState) => ({
+        ...prevState,
+        invalid: `Email or password is not valid.`
+      }));
     }
 };
 
-  return (
-    <div className={classes.paper}>
-      <Avatar className={classes.avatar}>
-        <PersonIcon className={classes.accountCircle} />
-      </Avatar>
-      <Typography variant="h4">Login</Typography>
-      <form className={classes.form} noValidate onSubmit={handleSubmit}>
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          id="email"
-          label="Email Address"
-          name="email"
-          autoComplete="email"
-          autoFocus
-          value={email}
-          onChange={handleChange} // Fix: No need for (e) => handleChange(e.target)
-        />
-        {submitted && errors.email && <span className="error">{errors.email}</span>}
-        
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          name="password"
-          label="Password"
-          type="password"
-          id="password"
-          autoComplete="current-password"
-          value={password}
-          onChange={handleChange}
-        />
-        {submitted && errors.password && <span className="error">{errors.password}</span>}
-        {submitted && invalid && <span className="error">{invalid}</span>}
-        
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          color="primary"
-          className={classes.submit}
-        >
-          LOGIN
-        </Button>
-        
-        <Grid container justifyContent="center">
-          <Grid item>
-            <Link component={RouterLink} to="/signup-page" variant="body2">
-              {"Not a member? Sign up"}
-            </Link>
-          </Grid>
+
+return (
+  <div className={classes.paper}>
+    <Avatar className={classes.avatar}>
+      <PersonIcon className={classes.accountCircle} />
+    </Avatar>
+    <Typography variant="h4">Login</Typography>
+    <form className={classes.form} noValidate onSubmit={handleSubmit}>
+      <TextField
+        variant="outlined"
+        margin="normal"
+        required
+        fullWidth
+        id="email"
+        label="Email Address"
+        name="email"
+        autoComplete="email"
+        autoFocus
+        value={email}
+        onChange={handleChange} // Fix: No need for (e) => handleChange(e.target)
+      />
+      {submitted && errors.email && <span className="error">{errors.email}</span>}
+
+      <TextField
+        variant="outlined"
+        margin="normal"
+        required
+        fullWidth
+        name="password"
+        label="Password"
+        type="password"
+        id="password"
+        autoComplete="current-password"
+        value={password}
+        onChange={handleChange}
+      />
+      {submitted && errors.password && <span className="error">{errors.password}</span>}
+      {submitted && invalid && <span className="error">{invalid}</span>}
+
+      <Button
+        type="submit"
+        fullWidth
+        variant="contained"
+        color="primary"
+        className={classes.submit}
+      >
+        LOGIN
+      </Button>
+
+      <Grid container justifyContent="center">
+        <Grid item>
+          <Link component={RouterLink} to="/signup-page" variant="body2">
+            {"Not a member? Sign up"}
+          </Link>
         </Grid>
-      </form>
-    </div>
-  );
+      </Grid>
+    </form>
+  </div>
+);
 };
 
 export default Login;

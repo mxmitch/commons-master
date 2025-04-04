@@ -21,19 +21,19 @@ export default function CategoryDropdown(props) {
   const classes = useStyles();
   const [category, setCategory] = React.useState(0);
 
-  const categories = [];
-  props.categories.forEach((c) => {
-    categories.push({
-      id: c.id,
-      value: c.id,
-      label: c.name
-    });
-  });
+  // Ensure categories are passed and available
+  const categories = props.categories || [];
+
+  const categoryOptions = categories.map((c) => ({
+    id: c.id,
+    value: c.id,
+    label: c.name,
+  }));
 
   const handleChange = (event) => {
-    const category = event.target.value;
-    setCategory(category);
-    props.passCategory(category);
+    const selectedCategory = event.target.value;
+    setCategory(selectedCategory);
+    props.passCategory(selectedCategory);
   };
 
   return (
@@ -42,15 +42,17 @@ export default function CategoryDropdown(props) {
         <TextField
           id='standard-select-currency'
           select
-          label='Select'
+          label='Select Category'
           value={category}
           onChange={handleChange}
           helperText='Please select a category'
         >
+          {/* Default option to show all bills */}
           <MenuItem key={0} value={0}>
             {'View All Bills'}
           </MenuItem>
-          {categories.map((option) => (
+          {/* Map through the categories */}
+          {categoryOptions.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
