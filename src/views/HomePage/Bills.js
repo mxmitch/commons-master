@@ -1,38 +1,59 @@
-import React from 'react';
+import React, { useState } from 'react';
 import BillCard from './BillCard';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 
-export default function Bills({ bills, childCategory, user, setUser, updateWatchList, categories }) {
-  // Debugging: Check what childCategory is
-  console.log("Selected Category ID:", childCategory);
-
+export default function Bills({ bills, user, setUser, updateWatchList, categories, filters }) {
   // Find the category name corresponding to the selected category ID (if not 0)
-  const selectedCategory = childCategory !== 0
-    ? categories.find(cat => cat.id === childCategory)
+  const selectedCategory = filters?.category !== 0
+    ? categories.find(cat => cat.id === filters.category)
     : null;
+  console.log('Selected Category after filter change:', selectedCategory);
 
-  // Debugging: Log the selected category
-  console.log("Selected Category:", selectedCategory);
+  // Log filters to ensure it's correctly passed and updated
+  console.log('Applied Filters:', filters);
 
-  // If childCategory is 0 (View All Bills), return all bills
+  // Filter bills based on selected category and additional filters
   const filteredBills = bills.filter((bill) => {
-    // If childCategory is 0, show all bills
-    if (childCategory === 0) {
-      return true;
-    }
+    if (!bill) return false;
 
-    // Otherwise, check if the bill's categories include the selected category's name
-    if (selectedCategory) {
-      return bill.assigned_categories?.includes(selectedCategory.uclassify_class);
-    }
+    // Category filter
+    const matchesCategory =
+      filters.category === 0 ||
+      (selectedCategory &&
+        bill.assigned_categories &&
+        bill.assigned_categories[0] === selectedCategory.uclassify_class);
 
-    return false; // If no valid selectedCategory exists
+    // Determine if the bill is passed based on the presence of received_royal_assent_date
+    const isPassed = bill.received_royal_assent_date !== null;
+
+    // If the filter status is "passed", check if the bill is passed
+    // If the filter status is anything else, check if the bill is active
+    const matchesStatus = filters?.status === 'passed' ? isPassed : !isPassed;
+
+    // Session filter
+    const matchesSession = filters.session ? bill.parl_session_code === filters.session : true;
+
+    // Chamber filter
+    const billChamber = bill.bill_number && typeof bill.bill_number === 'string'
+      ? bill.bill_number.includes('S-') ? 'Senate' : 'Commons'
+      : null;
+    const matchesChamber = filters?.senateHouse
+      ? billChamber.toLowerCase() === filters.senateHouse.toLowerCase()
+      : true;
+
+    // Date filter
+    const billDate = bill.passed_senate_first_reading_date || bill.passed_house_first_reading_date;
+    const matchesDate = filters.date ? new Date(billDate) >= new Date(filters.date) : true;
+
+    return matchesCategory && matchesStatus && matchesSession && matchesChamber && matchesDate;
   });
 
-  // If no bills match the filter, return a message
+  // Log the filtered results
+  console.log('Filtered Bills:', filteredBills);
+
   if (filteredBills.length === 0) {
-    return <div>No bills available for this category.</div>;
+    return <div>No bills available for this filter.</div>;
   }
 
   // Map through filtered bills and create BillCards

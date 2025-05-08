@@ -5,7 +5,7 @@ import GridContainer from '../../components/Grid/GridContainer.js';
 import GridItem from '../../components/Grid/GridItem.js';
 import Parallax from '../../components/Parallax/Parallax.js';
 import styles from '../../assets/jss/material-kit-react/views/components.js';
-import CategoryDropdown from './CategoryDropdown';
+import Filter from './Filter';
 import Bills from './Bills';
 import { Typography, CircularProgress } from '@mui/material/';
 
@@ -15,17 +15,22 @@ export default function Home(props) {
   const classes = useStyles();
   const [childCategory, setChildCategory] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({}); // Initialize with empty filters
 
-  // Check for availability of props.bills and props.categories
   useEffect(() => {
     if (props.bills && props.categories) {
       setLoading(false);
     }
   }, [props.bills, props.categories]);
 
-  // Ensure categories are passed correctly to Bills component, fallback if not available
-  const categories = props.categories || []; // Default to an empty array if not provided
-  const bills = props.bills || []; // Default to an empty array if not provided
+  // Ensure categories and bills are passed correctly
+  const categories = props.categories || [];
+  const bills = props.bills || [];
+
+  const applyFilters = (newFilters) => {
+    console.log('New filters received:', newFilters);
+    setFilters(newFilters); // Set the filters state with the new filter values
+  };
 
   return (
     <div>
@@ -53,17 +58,19 @@ export default function Home(props) {
           <CircularProgress style={{ display: 'block', margin: 'auto' }} />
         ) : (
           <>
-            <CategoryDropdown
+            <Filter
               categories={categories}
               passCategory={setChildCategory}
+              applyFilters={applyFilters} // Pass applyFilters function
             />
             <Bills
               user={props.user}
               bills={bills}
               childCategory={childCategory}
+              filters={filters} // Pass the filters state to Bills
               setUser={props.setUser}
               updateWatchList={props.updateWatchList}
-              categories={categories} // Ensure categories are passed to Bills
+              categories={categories}
             />
           </>
         )}
