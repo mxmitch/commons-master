@@ -5,8 +5,6 @@ import GridContainer from '../../components/Grid/GridContainer.js';
 import GridItem from '../../components/Grid/GridItem.js';
 import Parallax from '../../components/Parallax/Parallax.js';
 import styles from '../../assets/jss/material-kit-react/views/components.js';
-import Filter from './Filter';
-import Bills from './Bills';
 import { Typography, CircularProgress } from '@mui/material/';
 
 const useStyles = makeStyles(styles);
@@ -15,21 +13,67 @@ export default function Home(props) {
   const classes = useStyles();
   const [childCategory, setChildCategory] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({}); // Initialize with empty filters
+  const [filters, setFilters] = useState({
+    category: 0,
+    status: '',
+    session: '',
+    senateHouse: ''
+  });
+  const [filteredBills, setFilteredBills] = useState([]);
 
   useEffect(() => {
-    if (props.bills && props.categories) {
-      setLoading(false);
-    }
-  }, [props.bills, props.categories]);
+    handleApplyFilters({});
+  }, []);
 
   // Ensure categories and bills are passed correctly
   const categories = props.categories || [];
   const bills = props.bills || [];
 
-  const applyFilters = (newFilters) => {
-    console.log('New filters received:', newFilters);
-    setFilters(newFilters); // Set the filters state with the new filter values
+  const handleApplyFilters = async () => {
+    setLoading(true);
+
+    try {
+      const params = new URLSearchParams(filters);
+      const response = await fetch(`${process.env.REACT_APP_COMMONS_API}/api/bills?${params}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      const data = await response.json();
+      setFilteredBills(data.bills);
+    } catch (error) {
+      console.error('Error applying filters:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetFilters = async () => {
+    const defaultFilters = {
+      category: 0,
+      status: '',
+      session: '',
+      senateHouse: '',
+    };
+
+    setFilters(defaultFilters);
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_COMMONS_API}/api/bills`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      const data = await response.json();
+      setFilteredBills(data.bills);
+    } catch (error) {
+      console.error('Error resetting filters:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,27 +97,6 @@ export default function Home(props) {
         <Typography variant="h4" style={{ textAlign: 'center', margin: '1em' }}>
           See up to date information on bills in session in the House of Commons.
         </Typography>
-
-        {loading ? (
-          <CircularProgress style={{ display: 'block', margin: 'auto' }} />
-        ) : (
-          <>
-            <Filter
-              categories={categories}
-              passCategory={setChildCategory}
-              applyFilters={applyFilters} // Pass applyFilters function
-            />
-            <Bills
-              user={props.user}
-              bills={bills}
-              childCategory={childCategory}
-              filters={filters} // Pass the filters state to Bills
-              setUser={props.setUser}
-              updateWatchList={props.updateWatchList}
-              categories={categories}
-            />
-          </>
-        )}
       </div>
     </div>
   );

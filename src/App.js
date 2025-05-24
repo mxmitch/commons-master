@@ -9,6 +9,7 @@ import SignupPage from "./views/SignupPage/SignupPage.js";
 import WatchListPage from "./views/WatchListPage/WatchListPage.js";
 import LoadingSpinner from "./views/LoadingSpinner/LoadingSpinner.js";
 import Header from "./views/Header/Header";
+import BillsPage from "./views/BillsPage/BillsPage.js";
 
 import useLoading from "./hooks/useLoading";
 
@@ -143,6 +144,17 @@ const App = (props) => {
                     handleLogout={handleLogout}
                     loggedInStatus={loggedIn}
                     user={user}
+                  />
+                }
+              />
+              <Route
+                path="/bills"
+                element={
+                  <BillsPage
+                    categories={categories}
+                    user={user}
+                    setUser={setUser}
+                    updateWatchList={() => { }} // or pass real function
                   />
                 }
               />

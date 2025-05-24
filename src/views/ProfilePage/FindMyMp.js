@@ -5,6 +5,7 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 import { makeStyles } from '@mui/styles';
 
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
@@ -18,9 +19,8 @@ export default function FindMyMp({ user }) {
   const [mpRiding, setMpRiding] = useState('');
   const [mpWebsite, setMpWebsite] = useState('');
   const [mpEmail, setMpEmail] = useState('');
-  const [mpOfficeOttawa, setMpOfficeOttawa] = useState('');
-  const [mpOfficeLocal, setMpOfficeLocal] = useState('');
-
+  const [mpOfficeOttawa, setMpOfficeOttawa] = useState({});
+  const [mpOfficeLocal, setMpOfficeLocal] = useState({});
   const [errors, setErrors] = useState('');
   const { loading, updateLoadingState } = useLoading(false);
 
@@ -28,199 +28,197 @@ export default function FindMyMp({ user }) {
     root: {
       flexGrow: 1,
       width: '100%',
-      textAlign: 'center'
+      textAlign: 'center',
     },
     title: {
-      marginBottom: theme.spacing(2)
+      marginBottom: '1em',
     },
     myMp: {
-      textAlign: 'left'
-    },
-    divider: {
-      margin: '1em'
+      textAlign: 'left',
     },
     section: {
-      marginBottom: theme.spacing(2)
+      marginBottom: '1em',
     },
     submit: {
-      margin: '0.75em'
+      marginTop: '1em',
+      marginRight: '1em',
     },
-    button: {
-      marginTop: theme.spacing(2),
-      marginRight: theme.spacing(2)
-    }
   }));
 
   const classes = useStyles();
 
-  useEffect(() => {
-    validate(postalCode);
-  }, [postalCode]);
-
   const validate = (value) => {
     const postalCodeRegex = /^(?!.*[DFIOQU])[A-VXY][0-9][A-Z] ?[0-9][A-Z][0-9]$/;
-    let errorStr = '';
-    let isValid = true;
-
-    if (!(postalCode.length === 0 || postalCodeRegex.test(postalCode))) {
-      errorStr = 'Postal code must look like: A1A1A1.';
-      isValid = false;
+    if (!value || !postalCodeRegex.test(value)) {
+      setErrors('Postal code must look like: A1A1A1.');
+      return false;
     }
-
-    setErrors(errorStr);
-    return isValid;
+    setErrors('');
+    return true;
   };
 
-  const handleMp = () => {
-    return (
-      <Container xs={12} className={classes.root}>
-        <Grid container>
-          <Grid item xs={12} sm={4} md={4} style={{ marginBottom: '24px' }}>
-            <img alt="Your MP" src={mpPhoto} />
-          </Grid>
-          <Grid item xs={12} sm={8} md={8} className={classes.myMp}>
-            <Typography variant="h4" className={classes.title}>
-              <strong>Your Representative</strong>
-            </Typography>
-            <div className={classes.section}>
-              <Typography>
-                <strong>Name:</strong> {mpName}
-              </Typography>
-              <Typography>
-                <strong>Party: </strong>
-                {mpParty}
-              </Typography>
-              <Typography>
-                <strong>Riding: </strong>
-                {mpRiding}
-              </Typography>
-              <Typography>
-                <strong>Email: </strong>
-                {mpEmail}
-              </Typography>
-              <Button
-                className={classes.button}
-                variant="contained"
-                href={mpWebsite}
-                target="_blank"
-              >
-                WEBSITE
-              </Button>
-            </div>
-            <div className={classes.section}>
-              <Typography variant="h5">
-                <strong>Federal Office: </strong>
-              </Typography>
-              <Typography>
-                <strong>Address: </strong>
-                {mpOfficeLocal.postal}
-              </Typography>
-              <Typography>
-                <strong>Telephone: </strong>
-                {mpOfficeLocal.tel}
-              </Typography>
-            </div>
-            <div className={classes.section}>
-              <Typography variant="h5">
-                <strong>Local Office: </strong>
-              </Typography>
-              <Typography>
-                <strong>Address: </strong>
-                {mpOfficeOttawa.postal}
-              </Typography>
-              <Typography>
-                <strong>Telephone: </strong>
-                {mpOfficeOttawa.tel}
-              </Typography>
-              <Button
-                href={`mailto:${mpEmail.toLowerCase()}`}
-                variant="contained"
-                className={classes.button}
-              >
-                Email My MP
-              </Button>
-              <Button
-                href={`tel:+${mpOfficeOttawa.tel}`}
-                variant="contained"
-                className={classes.button}
-              >
-                Call My MP
-              </Button>
-            </div>
-          </Grid>
-        </Grid>
-      </Container>
-    );
-  };
+  const handleMpSubmit = async () => {
+    const strippedPostalCode = postalCode.replace(/\s/g, '');
 
-  const handleMpSubmit = async (event) => {
-    event.preventDefault();
-    const strippedPostalCode = postalCode.replace(/ /g, '');
-    setPostalCode((prev) => prev.replace(/ /g, ''));
+    if (!validate(strippedPostalCode)) return;
+
     updateLoadingState(true);
 
-    console.log(strippedPostalCode)
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_COMMONS_API}/api/findmp/mp/${strippedPostalCode}`
+      );
 
-    if (validate()) {
-      try {
-        const response = await axios.get(
-        `https://cors-anywhere.herokuapp.com/https://represent.opennorth.ca/postcodes/${strippedPostalCode}/?sets=federal-electoral-districts`, {
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-          }
-      });
-        setMpName(response.data.representatives_centroid[0].name);
-        setMpParty(response.data.representatives_centroid[0].party_name);
-        setMpPhoto(response.data.representatives_centroid[0].photo_url);
-        setMpRiding(response.data.representatives_centroid[0].district_name);
-        setMpWebsite(response.data.representatives_centroid[0].url);
-        setMpEmail(response.data.representatives_centroid[0].email);
-        setMpOfficeLocal(response.data.representatives_centroid[0].offices[0]);
-        setMpOfficeOttawa(response.data.representatives_centroid[0].offices[1]);
-        updateLoadingState(false);
-      } catch (error) {
-        updateLoadingState(false);
-        console.error(`Error occurred on handleMpSubmit: ${error}`);
-      }
+      const mp = response.data.representatives_centroid?.[0];
+      if (!mp) throw new Error("No MP found");
+
+      setMpName(mp.name);
+      setMpParty(mp.party_name);
+      setMpPhoto(mp.photo_url);
+      setMpRiding(mp.district_name);
+      setMpWebsite(mp.url);
+      setMpEmail(mp.email);
+      setMpOfficeLocal(mp.offices?.[0] || {});
+      setMpOfficeOttawa(mp.offices?.[1] || {});
+    } catch (error) {
+      console.error("Error occurred on handleMpSubmit:", error);
+      alert("Failed to retrieve MP.");
+    } finally {
+      updateLoadingState(false);
     }
   };
 
-  const findForm = () => {
-    return (
-      <div className={classes.root}>
-        {loading && <LoadingSpinner></LoadingSpinner>}
-        {!loading && (
-          <Fragment>
-            <Typography className={classes.title} variant="h4">
-              Find Your Member of Parliament
-            </Typography>
-            <Typography variant="h5" style={{ marginBottom: '1em' }}>
-              Look up your representative in the House of Commons
-            </Typography>
-            <form>
-              <TextField
-                id="outlined-basic"
-                name="postalCode"
-                label="Postal Code"
-                variant="outlined"
-                error={errors && errors.length > 0}
-                helperText={errors}
-                value={postalCode}
-                onChange={(e) => setPostalCode(e.target.value)}
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                className={classes.submit}
-                onClick={handleMpSubmit}
-              >
-                Submit
-              </Button>
-            </form>
-          </Fragment>
-        )}
-      </div>
+  const handleUseMyLocation = () => {
+    updateLoadingState(true);
+
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      updateLoadingState(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          const response = await axios.get(
+            `${process.env.REACT_APP_COMMONS_API}/api/findmp/point?lat=${latitude}&lng=${longitude}`
+          );
+
+          const mp = response.data.objects?.[0];
+          if (!mp) {
+            alert("No representative found for your location. You can try entering your postal code instead.");
+            updateLoadingState(false);
+            return;
+          }
+
+          setMpName(mp.name);
+          setMpParty(mp.party_name);
+          setMpPhoto(mp.photo_url);
+          setMpRiding(mp.district_name);
+          setMpWebsite(mp.url);
+          setMpEmail(mp.email);
+          setMpOfficeLocal(mp.offices?.[0] || {});
+          setMpOfficeOttawa(mp.offices?.[1] || {});
+        } catch (error) {
+          console.error("Geolocation MP lookup error:", error);
+          alert("We couldn’t find your MP. Please enter your postal code manually.");
+        } finally {
+          updateLoadingState(false);
+        }
+      },
+      (error) => {
+        console.warn("Geolocation failed:", error);
+        alert("Location access denied. You can still enter your postal code to find your MP.");
+        updateLoadingState(false);
+      }
     );
   };
-  return <div>{!mpName ? findForm() : handleMp()}</div>;
+
+  const renderMpInfo = () => (
+    <Container className={classes.root}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={4}>
+          {mpPhoto && <img alt="Your MP" src={mpPhoto} style={{ maxWidth: '100%' }} />}
+        </Grid>
+        <Grid item xs={12} sm={8} className={classes.myMp}>
+          <Typography variant="h4" className={classes.title}><strong>Your Representative</strong></Typography>
+          <div className={classes.section}>
+            <Typography><strong>Name:</strong> {mpName}</Typography>
+            <Typography><strong>Party:</strong> {mpParty}</Typography>
+            <Typography><strong>Riding:</strong> {mpRiding}</Typography>
+            <Typography><strong>Email:</strong> {mpEmail}</Typography>
+            {mpWebsite && (
+              <Button variant="contained" className={classes.submit} href={mpWebsite} target="_blank">
+                Website
+              </Button>
+            )}
+          </div>
+
+          {mpOfficeOttawa?.tel && (
+            <div className={classes.section}>
+              <Typography variant="h5"><strong>Ottawa Office:</strong></Typography>
+              <Typography><strong>Address:</strong> {mpOfficeOttawa.postal}</Typography>
+              <Typography><strong>Telephone:</strong> {mpOfficeOttawa.tel}</Typography>
+            </div>
+          )}
+
+          {mpOfficeLocal?.tel && (
+            <div className={classes.section}>
+              <Typography variant="h5"><strong>Local Office:</strong></Typography>
+              <Typography><strong>Address:</strong> {mpOfficeLocal.postal}</Typography>
+              <Typography><strong>Telephone:</strong> {mpOfficeLocal.tel}</Typography>
+            </div>
+          )}
+
+          {mpEmail && (
+            <Button variant="contained" className={classes.submit} href={`mailto:${mpEmail}`}>
+              Email My MP
+            </Button>
+          )}
+          {mpOfficeOttawa?.tel && (
+            <Button variant="contained" className={classes.submit} href={`tel:+${mpOfficeOttawa.tel}`}>
+              Call My MP
+            </Button>
+          )}
+        </Grid>
+      </Grid>
+    </Container>
+  );
+
+  const renderForm = () => (
+    <div className={classes.root}>
+      {loading && <LoadingSpinner />}
+      {!loading && (
+        <Fragment>
+          <Typography className={classes.title} variant="h4">Find Your Member of Parliament</Typography>
+          <Typography variant="h5" style={{ marginBottom: '1em' }}>
+            Look up your representative in the House of Commons
+          </Typography>
+          <form>
+            <TextField
+              name="postalCode"
+              label="Postal Code"
+              variant="outlined"
+              error={Boolean(errors)}
+              helperText={errors}
+              value={postalCode}
+              onChange={(e) => setPostalCode(e.target.value)}
+            />
+            <Box display="flex" gap={2} mt={2}>
+              <Button variant="contained" color="primary" onClick={handleMpSubmit}>
+                Submit Postal Code
+              </Button>
+              <Button variant="outlined" onClick={handleUseMyLocation}>
+                Use My Location
+              </Button>
+            </Box>
+          </form>
+        </Fragment>
+      )}
+    </div>
+  );
+
+  return <div>{!mpName ? renderForm() : renderMpInfo()}</div>;
 }

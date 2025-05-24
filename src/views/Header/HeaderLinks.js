@@ -1,7 +1,5 @@
 /*eslint-disable*/
 import React, { Fragment } from 'react';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Typography from '@mui/material/Typography';
 // react components for routing our app without refresh
 import { Link } from 'react-router-dom';
 
@@ -70,6 +68,17 @@ export default function HeaderLinks({
         </Fragment>
       ) : (
         <Fragment>
+          <ListItem className={classes.listItem}>
+            <Link to="/bills">
+              <Button
+                color="transparent"
+                className={classes.navLink}
+                onClick={handleDrawerToggle}
+              >
+                View Bills
+              </Button>
+            </Link>
+          </ListItem>
           <ListItem className={classes.listItem}>
             <Link to="/login-page">
               <Button

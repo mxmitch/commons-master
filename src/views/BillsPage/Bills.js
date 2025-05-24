@@ -58,7 +58,7 @@ export default function Bills({ bills, user, setUser, updateWatchList, categorie
 
   // Map through filtered bills and create BillCards
   const billCards = filteredBills.map((bill) => (
-    <Grid item xs={12} sm={6} md={3} lg={3} key={bill.id}>
+    <Grid item xs={12} sm={6} md={4} lg={3} key={bill.id}>
       <BillCard
         user={user}
         bill={bill}

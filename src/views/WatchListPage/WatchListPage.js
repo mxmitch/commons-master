@@ -4,8 +4,7 @@ import { makeStyles } from '@mui/styles';
 import GridContainer from '../../components/Grid/GridContainer.js';
 import GridItem from '../../components/Grid/GridItem.js';
 import Parallax from '../../components/Parallax/Parallax.js';
-import CategoryDropdown from '../HomePage/CategoryDropdown';
-import Bills from '../HomePage/Bills';
+import Bills from '../BillsPage/Bills.js';
 import styles from '../../assets/jss/material-kit-react/views/components.js';
 
 const useStyles = makeStyles(styles);
@@ -44,7 +43,6 @@ export default function WatchListPage({ bills, user, categories, updateWatchList
       </Parallax>
 
       <div className={classnames(classes.main, classes.mainRaised)}>
-        <CategoryDropdown categories={categories} passCategory={setChildCategory} />
         {user && (
           <Bills
             user={user}
