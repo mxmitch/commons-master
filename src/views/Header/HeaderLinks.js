@@ -32,6 +32,17 @@ export default function HeaderLinks({
       {loggedIn ? (
         <Fragment>
           <ListItem className={classes.listItem}>
+            <Link to="/bills">
+              <Button
+                color="transparent"
+                className={classes.navLink}
+                onClick={handleDrawerToggle}
+              >
+                View Bills
+              </Button>
+            </Link>
+          </ListItem>
+          <ListItem className={classes.listItem}>
             {user && (
               <Link to={`/user/${user.id}`}>
                 <Button

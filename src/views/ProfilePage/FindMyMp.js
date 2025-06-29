@@ -119,8 +119,8 @@ export default function FindMyMp({ user }) {
           setMpRiding(mp.district_name);
           setMpWebsite(mp.url);
           setMpEmail(mp.email);
-          setMpOfficeLocal(mp.offices?.[0] || {});
-          setMpOfficeOttawa(mp.offices?.[1] || {});
+          setMpOfficeLocal(mp.offices?.[1] || {});
+          setMpOfficeOttawa(mp.offices?.[0] || {});
         } catch (error) {
           console.error("Geolocation MP lookup error:", error);
           alert("We couldn’t find your MP. Please enter your postal code manually.");
