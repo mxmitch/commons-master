@@ -43,13 +43,17 @@ export default function WatchListPage({ bills, user, categories, updateWatchList
       </Parallax>
 
       <div className={classnames(classes.main, classes.mainRaised)}>
-        {user && (
+        {user && filteredBills.length > 0 ? (
           <Bills
             user={user}
             bills={filteredBills}
             childCategory={childCategory}
             updateWatchList={updateWatchList}
           />
+        ) : (
+          <div style={{ padding: "2rem", textAlign: "center" }}>
+            No bills in your watchlist yet.
+          </div>
         )}
       </div>
     </div>

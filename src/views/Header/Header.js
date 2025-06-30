@@ -12,7 +12,7 @@ import Button from '@mui/material/Button';
 import Hidden from '@mui/material/Hidden';
 import Drawer from '@mui/material/Drawer';
 // @material-ui/icons
-import Menu from '@mui/material/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
 // core components
 import styles from '../../assets/jss/material-kit-react/components/headerStyle.js';
 // react router
@@ -105,7 +105,7 @@ export default function Header(props) {
             aria-label="open drawer"
             onClick={handleDrawerToggle}
           >
-            <Menu />
+            <MenuIcon />
           </IconButton>
         </Hidden>
       </Toolbar>
