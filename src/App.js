@@ -10,6 +10,7 @@ import WatchListPage from "./views/WatchListPage/WatchListPage.js";
 import LoadingSpinner from "./views/LoadingSpinner/LoadingSpinner.js";
 import Header from "./views/Header/Header";
 import BillsPage from "./views/BillsPage/BillsPage.js";
+import axiosInstance from './utils/axiosInstance.js';
 
 import useLoading from "./hooks/useLoading";
 
@@ -56,11 +57,7 @@ const App = (props) => {
         return;
       }
 
-      const response = await axios.get(`${process.env.REACT_APP_COMMONS_API}/api/auth/loginStatus`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axiosInstance.get('/api/auth/loginStatus');
 
       if (response.data.loggedIn === "true") {
         setLoggedIn(true);
