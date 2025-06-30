@@ -44,7 +44,7 @@ const UserForm = ({ handleLogin }) => {
     console.log("Sending user data:", user); // Debugging line
   
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/register", user);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/register`, user);
       console.log("Signup successful:", response.data);
     } catch (error) {
       console.error("Signup error:", error.response?.data || error.message);
