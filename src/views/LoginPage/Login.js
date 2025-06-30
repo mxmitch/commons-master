@@ -102,7 +102,7 @@ const Login = (props) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login", // Ensure this matches your backend route
+        `${process.env.REACT_APP_COMMONS_API}/api/auth/login`,
         { email, password },
         { withCredentials: true } // If using sessions/cookies
       );
