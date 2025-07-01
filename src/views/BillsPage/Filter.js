@@ -17,9 +17,9 @@ export default function Filter({ categories = [], filters, setFilters, applyFilt
     };
 
     const handleApply = () => {
-        setFilters(localFilters);
-        applyFilters(); // trigger data fetch
-    };
+        setFilters(localFilters);     // update parent state
+        applyFilters(localFilters);   // pass fresh filters directly
+      };
 
     const handleReset = () => {
         if (onReset) onReset();
@@ -28,7 +28,7 @@ export default function Filter({ categories = [], filters, setFilters, applyFilt
     return (
         <div>
             <Grid container spacing={2}>
-                <Grid item xs={6} md={3}>
+                <Grid item xs={6} md={4}>
                     <TextField
                         select
                         label="Select Category"
@@ -37,15 +37,15 @@ export default function Filter({ categories = [], filters, setFilters, applyFilt
                         fullWidth
                         margin="normal"
                     >
-                        <MenuItem value={0}>View All Bills</MenuItem>
-                        {categories.map((c) => (
-                            <MenuItem key={c.id} value={c.id}>
-                                {c.name}
+                        <MenuItem value="0">View All Bills</MenuItem>
+                        {categories.map((cat) => (
+                            <MenuItem key={cat.id} value={cat.uclassify_class}>
+                                {cat.name}
                             </MenuItem>
                         ))}
                     </TextField>
                 </Grid>
-                <Grid item xs={6} md={3}>
+                <Grid item xs={6} md={4}>
                     <TextField
                         select
                         label="Select Status"
@@ -58,20 +58,7 @@ export default function Filter({ categories = [], filters, setFilters, applyFilt
                         <MenuItem value="passed">Passed</MenuItem>
                     </TextField>
                 </Grid>
-                <Grid item xs={6} md={3}>
-                    <TextField
-                        select
-                        label="Select Session"
-                        value={localFilters.session}
-                        onChange={handleChange('session')}
-                        fullWidth
-                        margin="normal"
-                    >
-                        <MenuItem value="44-1">Parliament 44, Session 1</MenuItem>
-                        <MenuItem value="44-2">Parliament 44, Session 2</MenuItem>
-                    </TextField>
-                </Grid>
-                <Grid item xs={6} md={3}>
+                <Grid item xs={6} md={4}>
                     <TextField
                         select
                         label="Senate or Commons"

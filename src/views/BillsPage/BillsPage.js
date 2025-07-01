@@ -9,119 +9,130 @@ import cover from "../../assets/img/bg12.jpg";
 import axiosInstance from '../../utils/axiosInstance'; // ✅ import centralized axios
 
 export default function BillsPage({ categories, user, setUser, updateWatchList }) {
-  const useStyles = makeStyles(styles);
-  const classes = useStyles();
+    const useStyles = makeStyles(styles);
+    const classes = useStyles();
 
-  const [filters, setFilters] = useState({
-    category: 0,
-    status: '',
-    session: '',
-    senateHouse: '',
-  });
-  const [bills, setBills] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [totalBills, setTotalBills] = useState(0);
-  const billsPerPage = 50;
+    const [filters, setFilters] = useState({
+        category: '0', // use string instead of 0
+        status: '',
+        session: '',
+        senateHouse: '',
+    });
+    const [bills, setBills] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [totalBills, setTotalBills] = useState(0);
+    const billsPerPage = 50;
 
-  const fetchBills = async (customFilters = filters, currentPage = page) => {
-    setIsLoading(true);
-    try {
-      const params = new URLSearchParams({
-        ...customFilters,
-        limit: billsPerPage,
-        offset: (currentPage - 1) * billsPerPage,
-      });
+    const fetchBills = async (customFilters = filters, currentPage = page, isFallbackAttempt = false) => {
+        setIsLoading(true);
 
-      // ✅ Use centralized axios instance
-      const response = await axiosInstance.get(`/api/bills?${params}`);
+        try {
+            const params = new URLSearchParams({
+                ...customFilters,
+                limit: billsPerPage,
+                offset: (currentPage - 1) * billsPerPage,
+            });
 
-      setBills(response.data.bills);
-      setTotalBills(response.data.total || 0);
-    } catch (error) {
-      console.error('Error fetching bills:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+            const response = await axiosInstance.get(`/api/bills?${params}`);
+            const billList = response.data.bills;
 
-  const applyFilters = () => {
-    setPage(1);
-    fetchBills(filters, 1);
-  };
+            // ✅ Fallback: If no results and not already retrying, reload without filters
+            if (billList.length === 0 && !isFallbackAttempt) {
+                console.warn("No bills found. Retrying without filters...");
+                fetchBills(
+                    { category: '0', status: '', session: '', senateHouse: '' },
+                    1,
+                    true
+                );
+                return;
+            }
 
-  const resetFilters = () => {
-    const defaultFilters = {
-      category: 0,
-      status: '',
-      session: '',
-      senateHouse: '',
+            setBills(billList);
+            setTotalBills(response.data.total || 0);
+        } catch (error) {
+            console.error("Error fetching bills:", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
-    setFilters(defaultFilters);
-    setPage(1);
-    fetchBills(defaultFilters, 1);
-  };
 
-  const handlePageChange = (event, value) => {
-    setPage(value);
-    fetchBills(filters, value);
-  };
+    const applyFilters = (customFilters = filters) => {
+        setPage(1);
+        fetchBills(customFilters, 1);
+      };
 
-  useEffect(() => {
-    fetchBills(filters, page);
-  }, []); // initial load
+      const resetFilters = () => {
+        const defaultFilters = {
+          category: '0',
+          status: '',
+          senateHouse: '',
+        };
+        setFilters(defaultFilters);
+        setPage(1);
+        fetchBills(defaultFilters, 1); // ✅ use immediate value
+      };
 
-  const totalPages = Math.ceil(totalBills / billsPerPage);
+    const handlePageChange = (event, value) => {
+        setPage(value);
+        fetchBills(filters, value);
+    };
 
-  return (
-    <div>
-      <Box
-        component="img"
-        sx={{
-          backgroundImage: `url(${cover})`,
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-          height: "500px",
-          width: "100%"
-        }}
-      />
-      <div className={classnames(classes.main, classes.mainRaised)}>
-        <Filter
-          categories={categories}
-          filters={filters}
-          setFilters={setFilters}
-          applyFilters={applyFilters}
-          onReset={resetFilters}
-        />
+    useEffect(() => {
+        fetchBills(filters, page);
+    }, []); // initial load
 
-        {isLoading ? (
-          <Box display="flex" justifyContent="center" mt={4}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <>
-            <Bills
-              bills={bills}
-              user={user}
-              setUser={setUser}
-              updateWatchList={updateWatchList}
-              categories={categories}
-              filters={filters}
+    const totalPages = Math.ceil(totalBills / billsPerPage);
+
+    return (
+        <div>
+            <Box
+                component="img"
+                sx={{
+                    backgroundImage: `url(${cover})`,
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
+                    backgroundSize: "cover",
+                    height: "500px",
+                    width: "100%"
+                }}
             />
-            {totalPages > 1 && (
-              <Box display="flex" justifyContent="center" mt={4} mb={4}>
-                <Pagination
-                  count={totalPages}
-                  page={page}
-                  onChange={handlePageChange}
-                  color="primary"
+            <div className={classnames(classes.main, classes.mainRaised)}>
+                <Filter
+                    categories={categories}
+                    filters={filters}
+                    setFilters={setFilters}
+                    applyFilters={applyFilters}
+                    onReset={resetFilters}
                 />
-              </Box>
-            )}
-          </>
-        )}
-      </div>
-    </div>
-  );
+
+                {isLoading ? (
+                    <Box display="flex" justifyContent="center" mt={4}>
+                        <CircularProgress />
+                    </Box>
+                ) : (
+                    <>
+                        <Bills
+                            bills={bills}
+                            user={user}
+                            setUser={setUser}
+                            updateWatchList={updateWatchList}
+                            categories={categories}
+                            filters={filters}
+                        />
+                        {totalBills > billsPerPage && (
+                            <Box display="flex" justifyContent="center" mt={4} mb={4}>
+                                <Pagination
+                                    count={totalPages}
+                                    page={page}
+                                    onChange={handlePageChange}
+                                    color="primary"
+                                />
+                            </Box>
+                        )}
+                    </>
+                )}
+            </div>
+        </div>
+    );
 }
