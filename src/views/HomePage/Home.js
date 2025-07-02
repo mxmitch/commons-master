@@ -6,75 +6,17 @@ import GridItem from '../../components/Grid/GridItem.js';
 import Parallax from '../../components/Parallax/Parallax.js';
 import styles from '../../assets/jss/material-kit-react/views/components.js';
 import { Typography, CircularProgress } from '@mui/material/';
+import FindMyMp from './FindMyMp';
+import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
+import { Button, Box } from '@mui/material';
+import { Link } from 'react-router-dom';
+import Footer from '../../components/Footer/Footer.js';
 
 const useStyles = makeStyles(styles);
 
-export default function Home(props) {
+export default function Home({ user }) {
   const classes = useStyles();
-  const [childCategory, setChildCategory] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    category: 0,
-    status: '',
-    session: '',
-    senateHouse: ''
-  });
-  const [filteredBills, setFilteredBills] = useState([]);
-
-  useEffect(() => {
-    handleApplyFilters({});
-  }, []);
-
-  // Ensure categories and bills are passed correctly
-  const categories = props.categories || [];
-  const bills = props.bills || [];
-
-  const handleApplyFilters = async () => {
-    setLoading(true);
-
-    try {
-      const params = new URLSearchParams(filters);
-      const response = await fetch(`${process.env.REACT_APP_COMMONS_API}/api/bills?${params}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      const data = await response.json();
-      setFilteredBills(data.bills);
-    } catch (error) {
-      console.error('Error applying filters:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResetFilters = async () => {
-    const defaultFilters = {
-      category: 0,
-      status: '',
-      session: '',
-      senateHouse: '',
-    };
-
-    setFilters(defaultFilters);
-    setLoading(true);
-
-    try {
-      const response = await fetch(`${process.env.REACT_APP_COMMONS_API}/api/bills`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      const data = await response.json();
-      setFilteredBills(data.bills);
-    } catch (error) {
-      console.error('Error resetting filters:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div>
@@ -97,7 +39,24 @@ export default function Home(props) {
         <Typography variant="h4" style={{ textAlign: 'center', margin: '1em' }}>
           See up to date information on bills in session in the House of Commons.
         </Typography>
+        <Box display="flex" justifyContent="center" mb={3}>
+          <Button
+            component={Link}
+            to="/bills"
+            variant="contained"
+            color="primary"
+          >
+            View Bills
+          </Button>
+        </Box>
+        <Divider className={classes.divider}></Divider>
+        <Grid container justify="center">
+          <Grid item xs={12}>
+            <FindMyMp user={user} />
+          </Grid>
+        </Grid>
       </div>
+      <Footer/>
     </div>
   );
 }

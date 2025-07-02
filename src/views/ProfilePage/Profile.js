@@ -6,9 +6,8 @@ import PersonIcon from '@mui/icons-material/Person';
 import Grid from '@mui/material/Grid';
 
 import ProfileText from './ProfileText';
-import FindMyMp from './FindMyMp';
+
 import { Typography } from '@mui/material';
-import Divider from '@mui/material/Divider';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -59,12 +58,6 @@ const Profile = ({ categories, user, handleProfileUpdate }) => {
               handleProfileUpdate={handleProfileUpdate}
             ></ProfileText>
           </div>
-        </Grid>
-      </Grid>
-      <Divider className={classes.divider}></Divider>
-      <Grid container justify="center">
-        <Grid item xs={12}>
-          <FindMyMp user={user} />
         </Grid>
       </Grid>
     </div>

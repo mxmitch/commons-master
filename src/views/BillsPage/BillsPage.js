@@ -7,6 +7,7 @@ import { Box, CircularProgress, Pagination } from '@mui/material';
 import styles from '../../assets/jss/material-kit-react/views/components.js';
 import cover from "../../assets/img/bg12.jpg";
 import axiosInstance from '../../utils/axiosInstance'; // ✅ import centralized axios
+import Footer from '../../components/Footer/Footer.js';
 
 export default function BillsPage({ categories, user, setUser, updateWatchList }) {
     const useStyles = makeStyles(styles);
@@ -133,6 +134,7 @@ export default function BillsPage({ categories, user, setUser, updateWatchList }
                     </>
                 )}
             </div>
+            <Footer/>
         </div>
     );
 }

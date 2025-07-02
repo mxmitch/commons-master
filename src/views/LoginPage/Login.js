@@ -41,9 +41,11 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
+const sanitizeInput = (value) => value.trim().replace(/[<>]/g, '');
+
 const Login = (props) => {
   const classes = useStyles();
-  const navigate = useNavigate(); // React Router v6 navigation
+  const navigate = useNavigate();
   const [state, setState] = useState({
     email: '',
     password: '',
@@ -58,40 +60,40 @@ const Login = (props) => {
     }
   }, [props.loggedInStatus, navigate]);
 
+  const validEmailRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+
+  const validateForm = (errors) => {
+    return Object.values(errors).every((val) => val.length === 0);
+  };
+
   const handleChange = (event) => {
-    const { name, value } = event.target; // Fix: Use event.target correctly
+    const { name, value } = event.target;
+    const cleanValue = sanitizeInput(value);
     let errors = state.errors;
 
     switch (name) {
       case 'email':
         errors.email =
-          value.length === 0 || !validEmailRegex.test(value)
+          cleanValue.length === 0 || !validEmailRegex.test(cleanValue)
             ? 'Email is not valid.'
             : '';
         break;
       case 'password':
         errors.password =
-          value.length === 0 || value.length < 5
-            ? 'Password must be at least 5 characters long!'
+          cleanValue.length === 0 || cleanValue.length < 5
+            ? 'Password must be at least 5 characters long.'
             : '';
         break;
       default:
         break;
     }
+
     setState((prevState) => ({
       ...prevState,
-      [name]: value,
+      [name]: cleanValue,
       errors,
       invalid: ''
     }));
-  };
-
-  const validEmailRegex = RegExp(
-    /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
-  );
-
-  const validateForm = (errors) => {
-    return Object.values(errors).every((val) => val.length === 0);
   };
 
   const { email, password, errors, invalid } = state;
@@ -100,91 +102,86 @@ const Login = (props) => {
     event.preventDefault();
     setSubmitted(true);
 
+    if (!validateForm(errors)) {
+      return;
+    }
+
     try {
-      const response = await axios.post(
+      await axios.post(
         `${process.env.REACT_APP_COMMONS_API}/api/auth/login`,
         { email, password },
-        { withCredentials: true } // If using sessions/cookies
+        { withCredentials: true } // Cookie-based auth
       );
 
-      // Store the token in localStorage
-      const { token } = response.data;
-      localStorage.setItem("authToken", token);  // Save token in localStorage
-
-      // Pass the token and user info to the parent component or update local state
-      props.handleLogin(response.data);
-
-      // Redirect to the homepage or protected route
-      navigate("/");
-
+      props.handleLogin(true); // Update auth state in parent
+      navigate('/');
     } catch (error) {
-      console.error("Login error:", error.response?.data || error.message);
+      console.error('Login error:', error.response?.data || error.message);
       setState((prevState) => ({
         ...prevState,
-        invalid: `Email or password is not valid.`
+        invalid: 'Login failed. Please check your credentials.'
       }));
     }
-};
+  };
 
+  return (
+    <div className={classes.paper}>
+      <Avatar className={classes.avatar}>
+        <PersonIcon className={classes.accountCircle} />
+      </Avatar>
+      <Typography variant="h4">Login</Typography>
+      <form className={classes.form} noValidate onSubmit={handleSubmit}>
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          id="email"
+          label="Email Address"
+          name="email"
+          autoComplete="email"
+          autoFocus
+          value={email}
+          onChange={handleChange}
+        />
+        {submitted && errors.email && <span className="error">{errors.email}</span>}
 
-return (
-  <div className={classes.paper}>
-    <Avatar className={classes.avatar}>
-      <PersonIcon className={classes.accountCircle} />
-    </Avatar>
-    <Typography variant="h4">Login</Typography>
-    <form className={classes.form} noValidate onSubmit={handleSubmit}>
-      <TextField
-        variant="outlined"
-        margin="normal"
-        required
-        fullWidth
-        id="email"
-        label="Email Address"
-        name="email"
-        autoComplete="email"
-        autoFocus
-        value={email}
-        onChange={handleChange} // Fix: No need for (e) => handleChange(e.target)
-      />
-      {submitted && errors.email && <span className="error">{errors.email}</span>}
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          name="password"
+          label="Password"
+          type="password"
+          id="password"
+          autoComplete="current-password"
+          value={password}
+          onChange={handleChange}
+        />
+        {submitted && errors.password && <span className="error">{errors.password}</span>}
+        {submitted && invalid && <span className="error">{invalid}</span>}
 
-      <TextField
-        variant="outlined"
-        margin="normal"
-        required
-        fullWidth
-        name="password"
-        label="Password"
-        type="password"
-        id="password"
-        autoComplete="current-password"
-        value={password}
-        onChange={handleChange}
-      />
-      {submitted && errors.password && <span className="error">{errors.password}</span>}
-      {submitted && invalid && <span className="error">{invalid}</span>}
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="primary"
+          className={classes.submit}
+        >
+          LOGIN
+        </Button>
 
-      <Button
-        type="submit"
-        fullWidth
-        variant="contained"
-        color="primary"
-        className={classes.submit}
-      >
-        LOGIN
-      </Button>
-
-      <Grid container justifyContent="center">
-        <Grid item>
-          <Link component={RouterLink} to="/signup-page" variant="body2">
-            {"Not a member? Sign up"}
-          </Link>
+        <Grid container justifyContent="center">
+          <Grid item>
+            <Link component={RouterLink} to="/signup-page" variant="body2">
+              {"Not a member? Sign up"}
+            </Link>
+          </Grid>
         </Grid>
-      </Grid>
-    </form>
-  </div>
-);
+      </form>
+    </div>
+  );
 };
 
 export default Login;

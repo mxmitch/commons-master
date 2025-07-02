@@ -1,18 +1,13 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import axios from 'axios';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import Container from '@mui/material/Container';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
+import { Box, Typography, TextField, Button, Grid, Container } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import useLoading from '../../hooks/useLoading';
 
 export default function FindMyMp({ user }) {
-  const [postalCode, setPostalCode] = useState(user.postal_code || '');
+  const [postalCode, setPostalCode] = useState(user?.postal_code || '');
   const [mpName, setMpName] = useState('');
   const [mpParty, setMpParty] = useState('');
   const [mpPhoto, setMpPhoto] = useState('');
@@ -105,10 +100,16 @@ export default function FindMyMp({ user }) {
           const response = await axios.get(
             `${process.env.REACT_APP_COMMONS_API}/api/findmp/point?lat=${latitude}&lng=${longitude}`
           );
-
-          const mp = response.data.objects?.[0];
+          
+          const mp = response.data.objects?.find(
+            (rep) =>
+              rep.elected_office?.toLowerCase() === 'mp' ||
+              rep.representative_set_name?.toLowerCase().includes('house of commons')
+          );
+          
           if (!mp) {
-            alert("No representative found for your location. You can try entering your postal code instead.");
+            console.warn("⚠️ No MP found in:", response.data.objects);
+            alert("We couldn’t find a federal MP for your location.");
             updateLoadingState(false);
             return;
           }
@@ -191,8 +192,10 @@ export default function FindMyMp({ user }) {
     <div className={classes.root}>
       {loading && <LoadingSpinner />}
       {!loading && (
-        <Fragment>
-          <Typography className={classes.title} variant="h4">Find Your Member of Parliament</Typography>
+        <Box mt={2}>
+          <Typography className={classes.title} variant="h4">
+            Find Your Member of Parliament
+          </Typography>
           <Typography variant="h5" style={{ marginBottom: '1em' }}>
             Look up your representative in the House of Commons
           </Typography>
@@ -206,7 +209,7 @@ export default function FindMyMp({ user }) {
               value={postalCode}
               onChange={(e) => setPostalCode(e.target.value)}
             />
-            <Box display="flex" gap={2} mt={2}>
+            <Box display="flex" gap={2} mt={2} justifyContent="center">
               <Button variant="contained" color="primary" onClick={handleMpSubmit}>
                 Submit Postal Code
               </Button>
@@ -215,7 +218,7 @@ export default function FindMyMp({ user }) {
               </Button>
             </Box>
           </form>
-        </Fragment>
+        </Box>
       )}
     </div>
   );

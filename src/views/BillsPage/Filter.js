@@ -26,57 +26,57 @@ export default function Filter({ categories = [], filters, setFilters, applyFilt
     };
 
     return (
-        <div>
-            <Grid container spacing={2}>
-                <Grid item xs={6} md={4}>
-                    <TextField
-                        select
-                        label="Select Category"
-                        value={localFilters.category}
-                        onChange={handleChange('category')}
-                        fullWidth
-                        margin="normal"
-                    >
-                        <MenuItem value="0">View All Bills</MenuItem>
-                        {categories.map((cat) => (
-                            <MenuItem key={cat.id} value={cat.uclassify_class}>
-                                {cat.name}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                </Grid>
-                <Grid item xs={6} md={4}>
-                    <TextField
-                        select
-                        label="Select Status"
-                        value={localFilters.status}
-                        onChange={handleChange('status')}
-                        fullWidth
-                        margin="normal"
-                    >
-                        <MenuItem value="active">Active</MenuItem>
-                        <MenuItem value="passed">Passed</MenuItem>
-                    </TextField>
-                </Grid>
-                <Grid item xs={6} md={4}>
-                    <TextField
-                        select
-                        label="Senate or Commons"
-                        value={localFilters.senateHouse}
-                        onChange={handleChange('senateHouse')}
-                        fullWidth
-                        margin="normal"
-                    >
-                        <MenuItem value="senate">Senate</MenuItem>
-                        <MenuItem value="commons">House of Commons</MenuItem>
-                    </TextField>
-                </Grid>
+        <Box mb={2}>
+          <Grid container spacing={2}>
+            <Grid item xs={6} md={4}>
+              <TextField
+                select
+                label="Select Category"
+                value={localFilters.category}
+                onChange={handleChange('category')}
+                fullWidth
+                margin="normal"
+              >
+                <MenuItem value="0">View All Bills</MenuItem>
+                {categories.map((cat) => (
+                  <MenuItem key={cat.id} value={cat.uclassify_class}>
+                    {cat.name}
+                  </MenuItem>
+                ))}
+              </TextField>
             </Grid>
-
-            <Box display="flex" justifyContent="flex-start" gap={2} mt={2}>
-                <Button variant="contained" onClick={handleApply}>Apply Filters</Button>
-                <Button variant="outlined" onClick={handleReset}>Reset Filters</Button>
-            </Box>
-        </div>
-    );
+            <Grid item xs={6} md={4}>
+              <TextField
+                select
+                label="Select Status"
+                value={localFilters.status}
+                onChange={handleChange('status')}
+                fullWidth
+                margin="normal"
+              >
+                <MenuItem value="active">Active</MenuItem>
+                <MenuItem value="passed">Passed</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid item xs={6} md={4}>
+              <TextField
+                select
+                label="Senate or Commons"
+                value={localFilters.senateHouse}
+                onChange={handleChange('senateHouse')}
+                fullWidth
+                margin="normal"
+              >
+                <MenuItem value="senate">Senate</MenuItem>
+                <MenuItem value="commons">House of Commons</MenuItem>
+              </TextField>
+            </Grid>
+          </Grid>
+      
+          <Box display="flex" justifyContent="flex-start" gap={2} mt={2}>
+            <Button variant="contained" onClick={handleApply}>Apply Filters</Button>
+            <Button variant="outlined" onClick={handleReset}>Reset Filters</Button>
+          </Box>
+        </Box>
+      );
 }
