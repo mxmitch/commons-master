@@ -1,43 +1,128 @@
-# Commons
+# 🏛️ Commons Master
 
-#### Up-to-date information and notifications about bills in progress in Canada's parliament.
+**Commons Master** is a React-based web app for browsing and filtering Canadian federal legislation. It connects to a custom Express.js API to fetch real-time data about bills, including their status, session, and machine-learned topic categories.
 
-![Commons App](./docs/commons-readme.png)
+🔗 **Live App**: [https://commons-app.netlify.app](https://commons-app.netlify.app)
 
-Commons aims to provide an easy to access source of information on current bills in session in Canada's federal parliament. The application sources data from various sources and serves it up to users in one easy to use location.
+---
 
-The goal is to provide Canadians with an easy way to keep up to date with the goings on in parliament and engage with their government representatives. The information aggregated by the app is sourced from various public government websites.
+## ✨ Features
 
-Bills are updated daily and sorted by category on the server. Users can select between email and SMS notifications for any bills they wish to follow and will receive daily updates if there are any new events for those bills.
+- 📜 Browse active and passed Canadian parliamentary bills  
+- 🧠 Categories powered by uClassify machine learning  
+- 🧭 Filter by session, house (Commons or Senate), and legislative status  
+- 🗂️ Paginated results with performance-optimized loading  
+- 🧪 Connected to a PostgreSQL + Express.js backend via REST API  
 
-The application also provides an easy way to look up Members of Parliament and retrieve their contact information.
+---
 
-### Front End Stack
+## 🚀 Getting Started
 
-- [React 16.9.0](https://reactjs.org/)
-- [Express 4.17.0](https://expressjs.com/)
+### Prerequisites
 
-##### Design
+- Node.js (v18+)
+- NPM
 
-- [Material-UI 4.3.2](https://material-ui.com/)
-- [Storybook 5.3.13](https://storybook.js.org/)
+### Installation
 
-##### Testing
+Clone the repository and install dependencies:
 
-- [Jest 24.9.0](https://jestjs.io/)
+```bash
+git clone https://github.com/mxmitch/commons-master.git
+cd commons-master
+npm install
+```
 
-### API Server
+### Environment Configuration
 
-#### _The business logic of the app is hosted on a separate API server._
+Create a `.env` file in the root folder (optional if using localhost by default):
 
-#### [Git Repo for the Commons API](https://github.com/Commoddity/commons-api)
+```env
+REACT_APP_API_BASE_URL=http://localhost:5000
+```
 
-### Website URL
+### Run the App Locally
 
-### _COMING SOON_
+```bash
+npm start
+```
 
-### Team Members
+Then visit `http://localhost:3000` in your browser.
 
-- [Frederick Lee](https://github.com/fgfl/)
-- [Mitch Lum](https://github.com/mxmitch)
-- [Pascal van Leeuwen](https://github.com/Commoddity/)
+---
+
+## 🔌 API Integration
+
+This frontend connects to the [`commons-api-master`](https://github.com/mxmitch/commons-api-master) backend.
+
+The API provides:
+
+- `GET /api/bills` – Fetch bills with filters like status, session, category, and pagination
+- `GET /api/categories` – Get list of available bill categories
+- `POST /api/auth/register` – Register new users
+- `POST /api/auth/login` – Login for user authentication
+
+Make sure the backend server is running and accessible at the base URL defined in your `.env`.
+
+---
+
+## 🗂️ Project Structure
+
+```
+src/
+├── api/                # Axios API request functions
+├── components/         # UI components (cards, headers, layout)
+├── filters/            # Filter UI components and logic
+├── pages/              # Page components like Home
+├── App.js              # React Router setup and global layout
+├── index.js            # App entry point
+```
+
+---
+
+## 🧪 Testing (Coming Soon)
+
+Testing will be added using:
+
+- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
+- [Jest](https://jestjs.io/)
+- [Cypress](https://www.cypress.io/) (for integration testing)
+
+---
+
+## 📸 Screenshots
+
+TBA
+
+Example:
+
+```
+📍 Filtered list of bills by category, status, and session
+📊 Real-time category display using uClassify API
+```
+
+---
+
+## 🛠️ Built With
+
+- [React](https://reactjs.org/)
+- [Material UI (MUI)](https://mui.com/)
+- [Axios](https://axios-http.com/)
+- [React Router](https://reactrouter.com/)
+- [Netlify](https://www.netlify.com/) for deployment
+- [Express.js API](https://github.com/mxmitch/commons-api-master)
+- [PostgreSQL](https://www.postgresql.org/)
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License — see the [LICENSE](./LICENSE) file for details.
+
+---
+
+## 🙌 Acknowledgements
+
+- Forked from initial project [`fgfl/commons`](https://github.com/fgfl/commons)
+- Parliamentary bill data from [parl.ca](https://www.parl.ca/)
+- Category classification powered by [uClassify](https://uclassify.com/)
