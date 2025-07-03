@@ -70,10 +70,12 @@ Make sure the backend server is running and accessible at the base URL defined i
 
 ```
 src/
-├── api/                # Axios API request functions
+├── assets/             # Image files and Material UI css
 ├── components/         # UI components (cards, headers, layout)
-├── filters/            # Filter UI components and logic
-├── pages/              # Page components like Home
+├── helpers/            # Helper functions for validation
+├── hooks/              # Loading Spinner
+├── utils/              # Axios instance
+├── views/              # Page components like Home
 ├── App.js              # React Router setup and global layout
 ├── index.js            # App entry point
 ```
@@ -92,16 +94,7 @@ Testing will be added using:
 
 ## 📸 Screenshots
 
-TBA
-
-Example:
-
-```
-📍 Filtered list of bills by category, status, and session
-📊 Real-time category display using uClassify API
-```
-
----
+Coming Soon
 
 ## 🛠️ Built With
 
