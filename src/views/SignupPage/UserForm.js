@@ -18,7 +18,6 @@ const UserForm = ({ handleLogin }) => {
   const [errors, setErrors] = useState([]);
   const [submitted, setSubmitted] = useState(false);
 
-  // Handles form field updates dynamically
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
     setFormData((prev) => ({
@@ -27,31 +26,47 @@ const UserForm = ({ handleLogin }) => {
     }));
   };
 
-  // Handles form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevents page refresh on form submission
+    e.preventDefault();
+    setSubmitted(true);
+    setErrors([]);
+
+    // Basic client-side validation before hitting the API
+    if (formData.password !== formData.passwordConfirmation) {
+      setErrors(['Passwords do not match.']);
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setErrors(['Password must be at least 8 characters.']);
+      return;
+    }
 
     const user = {
+      name: formData.name,
       username: formData.username,
       email: formData.email,
       password: formData.password,
-      phone_number: formData.phoneNumber,
-      postal_code: formData.postalCode,
+      phone_number: formData.phoneNumber || null,
+      postal_code: formData.postalCode || null,
       email_notification: formData.emailNotification,
       sms_notification: formData.smsNotification,
     };
-  
-    console.log("Sending user data:", user); // Debugging line
-  
+
     try {
-      const response = await axios.post(`${process.env.REACT_APP_COMMONS_API}/api/auth/register`, user);
-      console.log("Signup successful:", response.data);
+      const response = await axios.post(
+        `${process.env.REACT_APP_COMMONS_API}/api/auth/register`,
+        user,
+        { withCredentials: true } // required for the httpOnly cookie to be saved
+      );
+      console.log('Signup successful:', response.data);
+      handleLogin(response.data.user); // update app auth state
     } catch (error) {
-      console.error("Signup error:", error.response?.data || error.message);
-      if (error.response && error.response.data) {
-        setErrors([error.response.data.error]);  // If backend sends an error message
+      console.error('Signup error:', error.response?.data || error.message);
+      if (error.response?.data?.error) {
+        setErrors([error.response.data.error]);
       } else {
-        setErrors([error.message]);  // General error
+        setErrors(['Something went wrong. Please try again.']);
       }
     }
   };
@@ -61,24 +76,21 @@ const UserForm = ({ handleLogin }) => {
       <Typography variant="h4" align="center" gutterBottom>
         Sign Up
       </Typography>
-      
+
       {errors.length > 0 && (
         <Box sx={{ color: 'red', mb: 2 }}>
           {errors.map((error, index) => (
-            <Typography key={index} variant="body2">
-              {error}
-            </Typography>
+            <Typography key={index} variant="body2">{error}</Typography>
           ))}
         </Box>
       )}
 
-    <form onSubmit={handleSubmit}> {/* Add onSubmit here */}
+      <form onSubmit={handleSubmit}>
         <TextField fullWidth label="Full Name" name="name" value={formData.name} onChange={handleChange} margin="normal" required />
         <TextField fullWidth label="Username" name="username" value={formData.username} onChange={handleChange} margin="normal" required />
         <TextField fullWidth label="Email" name="email" type="email" value={formData.email} onChange={handleChange} margin="normal" required />
-        <TextField fullWidth label="Postal Code" name="postalCode" value={formData.postalCode} onChange={handleChange} margin="normal" required />
+        <TextField fullWidth label="Postal Code" name="postalCode" value={formData.postalCode} onChange={handleChange} margin="normal" />
         <TextField fullWidth label="Phone Number" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} margin="normal" />
-
         <TextField fullWidth label="Password" name="password" type="password" value={formData.password} onChange={handleChange} margin="normal" required />
         <TextField fullWidth label="Confirm Password" name="passwordConfirmation" type="password" value={formData.passwordConfirmation} onChange={handleChange} margin="normal" required />
 

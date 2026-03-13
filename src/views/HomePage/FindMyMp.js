@@ -65,6 +65,8 @@ export default function FindMyMp({ user }) {
       );
 
       const mp = response.data.representatives_centroid?.[0];
+      console.log("📦 API MP data:", response.data.representatives_centroid);
+
       if (!mp) throw new Error("No MP found");
 
       setMpName(mp.name);
@@ -100,7 +102,7 @@ export default function FindMyMp({ user }) {
           const response = await axios.get(
             `${process.env.REACT_APP_COMMONS_API}/api/findmp/point?lat=${latitude}&lng=${longitude}`
           );
-          
+
           const mp = response.data.objects?.find(
             (rep) =>
               rep.elected_office?.toLowerCase() === 'mp' ||
