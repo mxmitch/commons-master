@@ -1,188 +1,190 @@
-import React, { useEffect, useState, useRef } from "react";
-import classnames from "classnames";
-import PropTypes from "prop-types";
+import React, { useState } from 'react';
 
-import { makeStyles } from "@mui/styles";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Hidden from "@mui/material/Hidden";
-import Drawer from "@mui/material/Drawer";
-import Typography from "@mui/material/Typography";
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
 
-import MenuIcon from "@mui/icons-material/Menu";
+import MenuIcon from '@mui/icons-material/Menu';
 
-import styles from "../../assets/jss/material-kit-react/components/headerStyle.js";
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
-import HeaderLinks from "./HeaderLinks";
+const drawerWidth = 240;
 
-const useStyles = makeStyles(styles);
-
-const Header = ({
-  color = "white",
-  leftLinks,
-  brand,
-  fixed,
-  absolute,
-  changeColorOnScroll,
-  user,
+export default function Header({
   loggedIn,
   handleLogout,
-}) => {
-  const classes = useStyles();
+}) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const headerRef = useRef(null);
 
   const handleDrawerToggle = () => {
-    setMobileOpen((prev) => !prev);
+    setMobileOpen((prevState) => !prevState);
   };
 
-  useEffect(() => {
-    if (!changeColorOnScroll) return;
+  const navItems = loggedIn
+    ? [
+        { label: 'Home', path: '/' },
+        { label: 'Bills', path: '/bills' },
+        { label: 'Watch List', path: '/watch-list' },
+      ]
+    : [
+        { label: 'Home', path: '/' },
+        { label: 'Bills', path: '/bills' },
+        { label: 'Login', path: '/login-page' },
+        { label: 'Sign Up', path: '/signup-page' },
+      ];
 
-    const handleScroll = () => {
-      const scrollTop = window.pageYOffset;
-      const header = headerRef.current;
-
-      if (!header) return;
-
-      if (scrollTop > changeColorOnScroll.height) {
-        header.classList.remove(classes[color]);
-        header.classList.add(classes[changeColorOnScroll.color]);
-      } else {
-        header.classList.add(classes[color]);
-        header.classList.remove(classes[changeColorOnScroll.color]);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [changeColorOnScroll, color, classes]);
-
-  const rightLinks = (
-    <HeaderLinks
-      user={user}
-      loggedIn={loggedIn}
-      handleDrawerToggle={handleDrawerToggle}
-      handleLogout={handleLogout}
-    />
-  );
-
-  const appBarClasses = classnames(
-    classes.appBar,
-    color && classes[color],
-    fixed && classes.fixed,
-    absolute && classes.absolute
-  );
-
-  const brandComponent = (
-  <Link to="/" style={{ textDecoration: "none" }}>
-    <Typography
-      variant="h6"
+  const drawer = (
+    <Box
+      onClick={handleDrawerToggle}
       sx={{
-        color: color === "transparent" ? "white" : "#333",
-        fontWeight: 700,
-        letterSpacing: 1,
+        textAlign: 'center',
+        mt: 2,
       }}
     >
-      {brand}
-    </Typography>
-  </Link>
-);
+      <Typography
+        variant="h6"
+        sx={{
+          mb: 2,
+          fontWeight: 700,
+        }}
+      >
+        Commons
+      </Typography>
+
+      <List>
+        {navItems.map((item) => (
+          <ListItem key={item.label} disablePadding>
+            <ListItemButton
+              component={Link}
+              to={item.path}
+              sx={{ textAlign: 'center' }}
+            >
+              <ListItemText primary={item.label} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+
+        {loggedIn && (
+          <ListItem disablePadding>
+            <ListItemButton onClick={handleLogout}>
+              <ListItemText primary="Logout" />
+            </ListItemButton>
+          </ListItem>
+        )}
+      </List>
+    </Box>
+  );
 
   return (
-    <AppBar
-      ref={headerRef}
-      className={appBarClasses}
-      enableColorOnDark
-      elevation={0}
-      position="fixed"
-    >
-      <Toolbar className={classes.container}>
-        {leftLinks !== undefined ? brandComponent : null}
+    <Box sx={{ display: 'flex' }}>
+      <AppBar
+        component="nav"
+        position="fixed"
+        sx={{
+          backgroundColor: '#29c0a8',
+        }}
+      >
+        <Toolbar>
 
-        <div className={classes.flex}>
-          {leftLinks !== undefined ? (
-            <Hidden smDown implementation="css">
-              {leftLinks}
-            </Hidden>
-          ) : (
-            brandComponent
-          )}
-        </div>
-
-        <Hidden smDown implementation="css">
-          {rightLinks}
-        </Hidden>
-
-        <Hidden mdUp>
+          {/* MOBILE MENU BUTTON */}
           <IconButton
             color="inherit"
             aria-label="open drawer"
+            edge="start"
             onClick={handleDrawerToggle}
+            sx={{
+              mr: 2,
+              display: { sm: 'none' },
+            }}
           >
             <MenuIcon />
           </IconButton>
-        </Hidden>
-      </Toolbar>
 
-      <Hidden mdUp implementation="js">
+          {/* BRAND */}
+          <Typography
+            variant="h6"
+            component={Link}
+            to="/"
+            sx={{
+              flexGrow: 1,
+              fontWeight: 700,
+              color: 'white',
+              textDecoration: 'none',
+            }}
+          >
+            Commons
+          </Typography>
+
+          {/* DESKTOP NAV */}
+          <Box
+            sx={{
+              display: {
+                xs: 'none',
+                sm: 'block',
+              },
+            }}
+          >
+            {navItems.map((item) => (
+              <Button
+                key={item.label}
+                component={Link}
+                to={item.path}
+                sx={{
+                  color: '#fff',
+                }}
+              >
+                {item.label}
+              </Button>
+            ))}
+
+            {loggedIn && (
+              <Button
+                onClick={handleLogout}
+                sx={{ color: '#fff' }}
+              >
+                Logout
+              </Button>
+            )}
+          </Box>
+
+        </Toolbar>
+      </AppBar>
+
+      {/* MOBILE DRAWER */}
+      <nav>
         <Drawer
           variant="temporary"
           anchor="right"
           open={mobileOpen}
           onClose={handleDrawerToggle}
-          classes={{
-            paper: classes.drawerPaper,
+          ModalProps={{
+            keepMounted: true,
+          }}
+          sx={{
+            display: {
+              xs: 'block',
+              sm: 'none',
+            },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: drawerWidth,
+            },
           }}
         >
-          <div className={classes.appResponsive}>
-            {leftLinks}
-            {rightLinks}
-          </div>
+          {drawer}
         </Drawer>
-      </Hidden>
-    </AppBar>
+      </nav>
+
+      {/* SPACING BELOW FIXED APPBAR */}
+      <Toolbar />
+    </Box>
   );
-};
-
-Header.propTypes = {
-  color: PropTypes.oneOf([
-    "primary",
-    "info",
-    "success",
-    "warning",
-    "danger",
-    "transparent",
-    "white",
-    "rose",
-    "dark",
-  ]),
-  leftLinks: PropTypes.node,
-  brand: PropTypes.string,
-  fixed: PropTypes.bool,
-  absolute: PropTypes.bool,
-  changeColorOnScroll: PropTypes.shape({
-    height: PropTypes.number.isRequired,
-    color: PropTypes.oneOf([
-      "primary",
-      "info",
-      "success",
-      "warning",
-      "danger",
-      "transparent",
-      "white",
-      "rose",
-      "dark",
-    ]).isRequired,
-  }),
-  user: PropTypes.object,
-  loggedIn: PropTypes.bool,
-  handleLogout: PropTypes.func,
-};
-
-export default Header;
+}
