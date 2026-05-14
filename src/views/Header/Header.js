@@ -30,16 +30,16 @@ export default function Header({
 
   const navItems = loggedIn
     ? [
-        { label: 'Home', path: '/' },
-        { label: 'Bills', path: '/bills' },
-        { label: 'Watch List', path: '/watch-list' },
-      ]
+      { label: 'Home', path: '/' },
+      { label: 'Bills', path: '/bills' },
+      { label: 'Watch List', path: '/watch-list' },
+    ]
     : [
-        { label: 'Home', path: '/' },
-        { label: 'Bills', path: '/bills' },
-        { label: 'Login', path: '/login-page' },
-        { label: 'Sign Up', path: '/signup-page' },
-      ];
+      { label: 'Home', path: '/' },
+      { label: 'Bills', path: '/bills' },
+      { label: 'Login', path: '/login-page' },
+      { label: 'Sign Up', path: '/signup-page' },
+    ];
 
   const drawer = (
     <Box
@@ -89,7 +89,7 @@ export default function Header({
         component="nav"
         position="fixed"
         sx={{
-          backgroundColor: '#29c0a8',
+          backgroundColor: '#f44336',
         }}
       >
         <Toolbar>
@@ -110,14 +110,16 @@ export default function Header({
 
           {/* BRAND */}
           <Typography
-            variant="h6"
             component={Link}
             to="/"
             sx={{
               flexGrow: 1,
+              fontFamily: '"Prompt", sans-serif',
               fontWeight: 700,
-              color: 'white',
+              fontSize: '2rem',
+              color: '#FFF',
               textDecoration: 'none',
+              letterSpacing: '0.5px',
             }}
           >
             Commons
