@@ -10,6 +10,7 @@ import WatchListPage from "./views/WatchListPage/WatchListPage.js";
 import LoadingSpinner from "./views/LoadingSpinner/LoadingSpinner.js";
 import Header from "./views/Header/Header";
 import BillsPage from "./views/BillsPage/BillsPage.js";
+import Confirmation from "./views/SignupPage/Confirmation";
 
 import { useAuth } from "./context/AuthContext";
 
@@ -81,6 +82,8 @@ const App = () => {
           path="/signup-page"
           element={<SignupPage categories={categories} />}
         />
+
+        <Route path="/signup-success" element={<Confirmation />} />
 
         <Route
           path="/watch-list"
