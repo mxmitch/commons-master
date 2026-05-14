@@ -1,70 +1,70 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import PersonIcon from '@mui/icons-material/Person';
-import { Typography } from '@mui/material/';
-import { makeStyles } from '@mui/styles';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
+
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Link from "@mui/material/Link";
+import Grid from "@mui/material/Grid";
+import PersonIcon from "@mui/icons-material/Person";
+import { Typography } from "@mui/material/";
+import { makeStyles } from "@mui/styles";
+
+import { useAuth } from "../../context/AuthContext";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4),
-    alignItems: 'center',
+    alignItems: "center",
     padding: theme.spacing(2),
-    textAlign: 'center'
+    textAlign: "center",
   },
   avatar: {
-    margin: '0 auto',
+    margin: "0 auto",
     marginBottom: theme.spacing(2),
-    width: '120px',
-    height: '120px',
-    backgroundColor: '#29c0a8'
+    width: "120px",
+    height: "120px",
+    backgroundColor: "#29c0a8",
   },
   form: {
-    width: '100%',
+    width: "100%",
     marginTop: theme.spacing(1),
-    textAlign: 'center'
+    textAlign: "center",
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
-    backgroundColor: '#29c0a8'
+    backgroundColor: "#29c0a8",
   },
   accountCircle: {
-    width: '100px',
-    height: '100px',
-    color: 'white'
-  }
+    width: "100px",
+    height: "100px",
+    color: "white",
+  },
 }));
 
-const sanitizeInput = (value) => value.trim().replace(/[<>]/g, '');
+const sanitizeInput = (value) => value.trim().replace(/[<>]/g, "");
 
-const Login = (props) => {
+const Login = () => {
   const classes = useStyles();
   const navigate = useNavigate();
+  const { login } = useAuth();
+
   const [state, setState] = useState({
-    email: '',
-    password: '',
-    errors: { email: '', password: '' },
-    invalid: ''
+    email: "",
+    password: "",
+    errors: { email: "", password: "" },
+    invalid: "",
   });
+
   const [submitted, setSubmitted] = useState(false);
 
-  useEffect(() => {
-    if (props.loggedInStatus) {
-      navigate('/');
-    }
-  }, [props.loggedInStatus, navigate]);
+  const validEmailRegex =
+    /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
-  const validEmailRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-
-  const validateForm = (errors) => {
-    return Object.values(errors).every((val) => val.length === 0);
-  };
+  const validateForm = (errors) =>
+    Object.values(errors).every((val) => val.length === 0);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -72,27 +72,27 @@ const Login = (props) => {
     let errors = state.errors;
 
     switch (name) {
-      case 'email':
+      case "email":
         errors.email =
           cleanValue.length === 0 || !validEmailRegex.test(cleanValue)
-            ? 'Email is not valid.'
-            : '';
+            ? "Email is not valid."
+            : "";
         break;
-      case 'password':
+      case "password":
         errors.password =
-          cleanValue.length === 0 || cleanValue.length < 5
-            ? 'Password must be at least 5 characters long.'
-            : '';
+          cleanValue.length === 0 || cleanValue.length < 8
+            ? "Password must be at least 8 characters long."
+            : "";
         break;
       default:
         break;
     }
 
-    setState((prevState) => ({
-      ...prevState,
+    setState((prev) => ({
+      ...prev,
       [name]: cleanValue,
       errors,
-      invalid: ''
+      invalid: "",
     }));
   };
 
@@ -102,24 +102,25 @@ const Login = (props) => {
     event.preventDefault();
     setSubmitted(true);
 
-    if (!validateForm(errors)) {
-      return;
-    }
+    if (!validateForm(errors)) return;
 
     try {
-      await axios.post(
+      const response = await axios.post(
         `${process.env.REACT_APP_COMMONS_API}/api/auth/login`,
         { email, password },
-        { withCredentials: true } // Cookie-based auth
+        { withCredentials: true }
       );
 
-      props.handleLogin(true); // Update auth state in parent
-      navigate('/');
+      // 🔥 THIS replaces props.handleLogin
+      login(response.data);
+
+      navigate("/");
     } catch (error) {
-      console.error('Login error:', error.response?.data || error.message);
-      setState((prevState) => ({
-        ...prevState,
-        invalid: 'Login failed. Please check your credentials.'
+      console.error("Login error:", error.response?.data || error.message);
+
+      setState((prev) => ({
+        ...prev,
+        invalid: "Login failed. Please check your credentials.",
       }));
     }
   };
@@ -129,7 +130,9 @@ const Login = (props) => {
       <Avatar className={classes.avatar}>
         <PersonIcon className={classes.accountCircle} />
       </Avatar>
+
       <Typography variant="h4">Login</Typography>
+
       <form className={classes.form} noValidate onSubmit={handleSubmit}>
         <TextField
           variant="outlined"
@@ -144,7 +147,10 @@ const Login = (props) => {
           value={email}
           onChange={handleChange}
         />
-        {submitted && errors.email && <span className="error">{errors.email}</span>}
+
+        {submitted && errors.email && (
+          <span className="error">{errors.email}</span>
+        )}
 
         <TextField
           variant="outlined"
@@ -159,8 +165,14 @@ const Login = (props) => {
           value={password}
           onChange={handleChange}
         />
-        {submitted && errors.password && <span className="error">{errors.password}</span>}
-        {submitted && invalid && <span className="error">{invalid}</span>}
+
+        {submitted && errors.password && (
+          <span className="error">{errors.password}</span>
+        )}
+
+        {submitted && invalid && (
+          <span className="error">{invalid}</span>
+        )}
 
         <Button
           type="submit"

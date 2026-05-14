@@ -1,6 +1,6 @@
-import React, { useEffect, useState, Fragment } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import axiosInstance from './utils/axiosInstance';
+import axiosInstance from "./utils/axiosInstance";
 
 import Home from "./views/HomePage/Home.js";
 import ProfilePage from "./views/ProfilePage/ProfilePage.js";
@@ -11,125 +11,94 @@ import LoadingSpinner from "./views/LoadingSpinner/LoadingSpinner.js";
 import Header from "./views/Header/Header";
 import BillsPage from "./views/BillsPage/BillsPage.js";
 
-import useLoading from "./hooks/useLoading";
+import { useAuth } from "./context/AuthContext";
 
-const App = (props) => {
-  const [user, setUser] = useState(null);
-  const [loggedIn, setLoggedIn] = useState(false);
+const App = () => {
+  const { user, loggedIn, loading, logout } = useAuth();
+
   const [bills, setBills] = useState([]);
   const [categories, setCategories] = useState([]);
-  const { loading, updateLoadingState } = useLoading(bills.length === 0);
 
   useEffect(() => {
-    loginStatus();
+    const fetchBills = async () => {
+      try {
+        const res = await axiosInstance.get("/api/bills");
+        setBills(res.data.bills);
+        setCategories(res.data.categories);
+      } catch (err) {
+        console.error("Bills error:", err);
+      }
+    };
+
     fetchBills();
   }, []);
 
-  const fetchBills = async () => {
-    try {
-      const response = await axiosInstance.get('/api/bills');
-      setBills(response.data.bills);
-      setCategories(response.data.categories);
-    } catch (error) {
-      console.error("Error occurred on fetchBills:", error);
-    } finally {
-      updateLoadingState(false);
-    }
-  };
-
-  const loginStatus = async () => {
-    updateLoadingState(true);
-    try {
-      const response = await axiosInstance.get('/api/auth/check-auth');
-
-      if (response.data.loggedIn) {
-        setLoggedIn(true);
-        setUser(response.data.user);
-      } else {
-        setLoggedIn(false);
-        setUser(null);
-      }
-    } catch (error) {
-      console.error("Error occurred on loginStatus:", error);
-      setLoggedIn(false);
-      setUser(null);
-    } finally {
-      updateLoadingState(false);
-    }
-  };
-
-  const handleLogin = (userData) => {
-    setUser(userData.user);
-    setLoggedIn(true);
-  };
-
-  const handleLogout = async () => {
-    updateLoadingState(true);
-    try {
-      await axiosInstance.delete('/api/auth/logout');
-      setUser(null);
-      setLoggedIn(false);
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      updateLoadingState(false);
-    }
-  };
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center"
+      }}>
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <Router>
-        {loading ? (
-          <div
-            style={{
-              minHeight: "100vh",
-              minWidth: "100vw",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-            }}
-          >
-            <LoadingSpinner />
-          </div>
-        ) : (
-          <Fragment>
-            <Header
-              color="transparent"
-              brand="Commons"
-              fixed
-              changeColorOnScroll={{
-                height: 200,
-                color: "white",
-              }}
+    <Router>
+      <Header
+        user={user}
+        loggedIn={loggedIn}
+        handleLogout={logout}
+      />
+
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Home
+              bills={bills}
+              categories={categories}
               user={user}
-              loggedIn={loggedIn}
-              handleLogout={handleLogout}
-              {...props}
+              loggedInStatus={loggedIn}
             />
-            <Routes>
-              <Route path="/" element={
-                <Home bills={bills} categories={categories} handleLogout={handleLogout} loggedInStatus={loggedIn} user={user} />
-              } />
-              <Route path="/bills" element={
-                <BillsPage categories={categories} user={user} setUser={setUser} updateWatchList={() => { }} />
-              } />
-              <Route path="/login-page" element={
-                <LoginPage handleLogin={handleLogin} loggedInStatus={loggedIn} />
-              } />
-              <Route path="/signup-page" element={
-                <SignupPage categories={categories} handleLogin={handleLogin} loggedInStatus={loggedIn} />
-              } />
-              <Route path="/watch-list" element={
-                <WatchListPage bills={bills} user={user} categories={categories} handleLogin={handleLogin} loggedInStatus={loggedIn} />
-              } />
-              <Route path="/user/:id" element={
-                <ProfilePage user={user} loggedInStatus={loggedIn} />
-              } />
-            </Routes>
-          </Fragment>
-        )}
-      </Router>
-    </div>
+          }
+        />
+
+        <Route
+          path="/bills"
+          element={<BillsPage categories={categories} user={user} />}
+        />
+
+        <Route
+          path="/login-page"
+          element={<LoginPage />}
+        />
+
+        <Route
+          path="/signup-page"
+          element={<SignupPage categories={categories} />}
+        />
+
+        <Route
+          path="/watch-list"
+          element={
+            <WatchListPage
+              bills={bills}
+              user={user}
+              categories={categories}
+            />
+          }
+        />
+
+        <Route
+          path="/user/:id"
+          element={<ProfilePage user={user} />}
+        />
+      </Routes>
+    </Router>
   );
 };
 

@@ -6,6 +6,7 @@ import App from './App.js';
 import axios from 'axios';
 import CssBaseline from '@mui/material/CssBaseline';
 import { StyledEngineProvider } from '@mui/material/styles';
+import { AuthProvider } from "./context/AuthContext";
 
 axios.defaults.withCredentials = true;
 
@@ -17,9 +18,11 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <StyledEngineProvider injectFirst>
-  <ThemeProvider theme={theme}>
-     <CssBaseline />
-    <App history={history} />
-  </ThemeProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <AuthProvider>
+      <App history={history} />
+      </AuthProvider>
+    </ThemeProvider>
   </StyledEngineProvider>,
 );
