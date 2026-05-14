@@ -6,9 +6,9 @@ import { makeStyles } from "@mui/styles";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button";
 import Hidden from "@mui/material/Hidden";
 import Drawer from "@mui/material/Drawer";
+import Typography from "@mui/material/Typography";
 
 import MenuIcon from "@mui/icons-material/Menu";
 
