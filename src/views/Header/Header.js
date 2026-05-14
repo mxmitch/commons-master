@@ -80,10 +80,19 @@ const Header = ({
   );
 
   const brandComponent = (
-    <Link to="/" style={{ textDecoration: "none" }}>
-      <Button className={classes.title}>{brand}</Button>
-    </Link>
-  );
+  <Link to="/" style={{ textDecoration: "none" }}>
+    <Typography
+      variant="h6"
+      sx={{
+        color: color === "transparent" ? "white" : "#333",
+        fontWeight: 700,
+        letterSpacing: 1,
+      }}
+    >
+      {brand}
+    </Typography>
+  </Link>
+);
 
   return (
     <AppBar
@@ -91,6 +100,7 @@ const Header = ({
       className={appBarClasses}
       enableColorOnDark
       elevation={0}
+      position="fixed"
     >
       <Toolbar className={classes.container}>
         {leftLinks !== undefined ? brandComponent : null}

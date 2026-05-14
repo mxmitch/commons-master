@@ -1,28 +1,41 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createBrowserHistory } from 'history';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import App from './App.js';
-import axios from 'axios';
-import CssBaseline from '@mui/material/CssBaseline';
-import { StyledEngineProvider } from '@mui/material/styles';
-import { AuthProvider } from "./context/AuthContext";
 
+import axios from 'axios';
+
+import {
+  ThemeProvider,
+  createTheme,
+  StyledEngineProvider
+} from '@mui/material/styles';
+
+import CssBaseline from '@mui/material/CssBaseline';
+
+import './index.css';
+
+import App from './App';
+import { AuthProvider } from './context/AuthContext';
+
+// Enable cookies globally for axios
 axios.defaults.withCredentials = true;
 
-var history = createBrowserHistory();
-
+// Create MUI theme
 const theme = createTheme();
 
+// React root
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-  <StyledEngineProvider injectFirst>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AuthProvider>
-      <App history={history} />
-      </AuthProvider>
-    </ThemeProvider>
-  </StyledEngineProvider>,
+  <React.StrictMode>
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+
+      </ThemeProvider>
+    </StyledEngineProvider>
+  </React.StrictMode>
 );
