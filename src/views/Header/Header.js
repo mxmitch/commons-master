@@ -1,92 +1,100 @@
-import React from 'react';
-// nodejs library that concatenates classes
-import classnames from 'classnames';
-// nodejs library to set properties for components
-import PropTypes from 'prop-types';
-// @material-ui/core components
-import { makeStyles } from '@mui/styles';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Button from '@mui/material/Button';
-import Hidden from '@mui/material/Hidden';
-import Drawer from '@mui/material/Drawer';
-// @material-ui/icons
-import MenuIcon from '@mui/icons-material/Menu';
-// core components
-import styles from '../../assets/jss/material-kit-react/components/headerStyle.js';
-// react router
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState, useRef } from "react";
+import classnames from "classnames";
+import PropTypes from "prop-types";
 
-import HeaderLinks from './HeaderLinks';
+import { makeStyles } from "@mui/styles";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
+import Hidden from "@mui/material/Hidden";
+import Drawer from "@mui/material/Drawer";
+
+import MenuIcon from "@mui/icons-material/Menu";
+
+import styles from "../../assets/jss/material-kit-react/components/headerStyle.js";
+import { Link } from "react-router-dom";
+
+import HeaderLinks from "./HeaderLinks";
 
 const useStyles = makeStyles(styles);
 
-export default function Header(props) {
+const Header = ({
+  color = "white",
+  leftLinks,
+  brand,
+  fixed,
+  absolute,
+  changeColorOnScroll,
+  user,
+  loggedIn,
+  handleLogout,
+}) => {
   const classes = useStyles();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const headerRef = useRef(null);
 
-  React.useEffect(() => {
-    if (props.changeColorOnScroll) {
-      window.addEventListener('scroll', headerColorChange);
-    }
-    return function cleanup() {
-      if (props.changeColorOnScroll) {
-        window.removeEventListener('scroll', headerColorChange);
+  const handleDrawerToggle = () => {
+    setMobileOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (!changeColorOnScroll) return;
+
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset;
+      const header = headerRef.current;
+
+      if (!header) return;
+
+      if (scrollTop > changeColorOnScroll.height) {
+        header.classList.remove(classes[color]);
+        header.classList.add(classes[changeColorOnScroll.color]);
+      } else {
+        header.classList.add(classes[color]);
+        header.classList.remove(classes[changeColorOnScroll.color]);
       }
     };
-  }, [props.changeColorOnScroll]);
 
-  function handleDrawerToggle() {
-    setMobileOpen(!mobileOpen);
-  }
+    window.addEventListener("scroll", handleScroll);
 
-  const headerColorChange = () => {
-    const { color, changeColorOnScroll } = props;
-    const windowsScrollTop = window.pageYOffset;
-    if (windowsScrollTop > changeColorOnScroll.height) {
-      document.body
-        .getElementsByTagName('header')[0]
-        .classList.remove(classes[color]);
-      document.body
-        .getElementsByTagName('header')[0]
-        .classList.add(classes[changeColorOnScroll.color]);
-    } else {
-      document.body
-        .getElementsByTagName('header')[0]
-        .classList.add(classes[color]);
-      document.body
-        .getElementsByTagName('header')[0]
-        .classList.remove(classes[changeColorOnScroll.color]);
-    }
-  };
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [changeColorOnScroll, color, classes]);
 
   const rightLinks = (
     <HeaderLinks
-      user={props.user}
-      loggedIn={props.loggedIn}
-      handleDrawerToggle={(e) => handleDrawerToggle()}
-      handleLogout={props.handleLogout}
+      user={user}
+      loggedIn={loggedIn}
+      handleDrawerToggle={handleDrawerToggle}
+      handleLogout={handleLogout}
     />
   );
 
-  const { color, leftLinks, brand, fixed, absolute } = props;
-  const appBarClasses = classnames({
-    [classes.appBar]: true,
-    [classes[color]]: color,
-    [classes.absolute]: absolute,
-    [classes.fixed]: fixed
-  });
+  const appBarClasses = classnames(
+    classes.appBar,
+    color && classes[color],
+    fixed && classes.fixed,
+    absolute && classes.absolute
+  );
+
   const brandComponent = (
-    <Link to="/">
+    <Link to="/" style={{ textDecoration: "none" }}>
       <Button className={classes.title}>{brand}</Button>
     </Link>
   );
 
   return (
-    <AppBar className={appBarClasses} enableColorOnDark>
+    <AppBar
+      ref={headerRef}
+      className={appBarClasses}
+      enableColorOnDark
+      elevation={0}
+    >
       <Toolbar className={classes.container}>
         {leftLinks !== undefined ? brandComponent : null}
+
         <div className={classes.flex}>
           {leftLinks !== undefined ? (
             <Hidden smDown implementation="css">
@@ -96,9 +104,11 @@ export default function Header(props) {
             brandComponent
           )}
         </div>
+
         <Hidden smDown implementation="css">
           {rightLinks}
         </Hidden>
+
         <Hidden mdUp>
           <IconButton
             color="inherit"
@@ -109,15 +119,16 @@ export default function Header(props) {
           </IconButton>
         </Hidden>
       </Toolbar>
+
       <Hidden mdUp implementation="js">
         <Drawer
           variant="temporary"
-          anchor={'right'}
+          anchor="right"
           open={mobileOpen}
-          classes={{
-            paper: classes.drawerPaper
-          }}
           onClose={handleDrawerToggle}
+          classes={{
+            paper: classes.drawerPaper,
+          }}
         >
           <div className={classes.appResponsive}>
             {leftLinks}
@@ -127,25 +138,20 @@ export default function Header(props) {
       </Hidden>
     </AppBar>
   );
-}
-
-Header.defaultProps = {
-  color: 'white'  // Corrected defaultProps here
 };
 
 Header.propTypes = {
   color: PropTypes.oneOf([
-    'primary',
-    'info',
-    'success',
-    'warning',
-    'danger',
-    'transparent',
-    'white',
-    'rose',
-    'dark'
+    "primary",
+    "info",
+    "success",
+    "warning",
+    "danger",
+    "transparent",
+    "white",
+    "rose",
+    "dark",
   ]),
-  rightLinks: PropTypes.node,
   leftLinks: PropTypes.node,
   brand: PropTypes.string,
   fixed: PropTypes.bool,
@@ -153,15 +159,20 @@ Header.propTypes = {
   changeColorOnScroll: PropTypes.shape({
     height: PropTypes.number.isRequired,
     color: PropTypes.oneOf([
-      'primary',
-      'info',
-      'success',
-      'warning',
-      'danger',
-      'transparent',
-      'white',
-      'rose',
-      'dark'
-    ]).isRequired
-  })
+      "primary",
+      "info",
+      "success",
+      "warning",
+      "danger",
+      "transparent",
+      "white",
+      "rose",
+      "dark",
+    ]).isRequired,
+  }),
+  user: PropTypes.object,
+  loggedIn: PropTypes.bool,
+  handleLogout: PropTypes.func,
 };
+
+export default Header;
