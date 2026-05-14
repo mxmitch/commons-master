@@ -20,9 +20,11 @@ const Confirmation = (props) => {
     props.nextStep(4);
   };
 
-  const categories = props.details.categories.map((categoryId) => {
+  const categories = props.details?.categories?.map((categoryId) => {
     return (
-      <Typography key={categoryId}>{idToCategoryName(categoryId)}</Typography>
+      <Typography key={categoryId}>
+        {idToCategoryName(categoryId)}
+      </Typography>
     );
   });
 

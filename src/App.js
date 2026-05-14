@@ -10,7 +10,7 @@ import WatchListPage from "./views/WatchListPage/WatchListPage.js";
 import LoadingSpinner from "./views/LoadingSpinner/LoadingSpinner.js";
 import Header from "./views/Header/Header";
 import BillsPage from "./views/BillsPage/BillsPage.js";
-import Confirmation from "./views/SignupPage/Confirmation";
+import Success from "./views/SignupPage/Success";
 
 import { useAuth } from "./context/AuthContext";
 
@@ -80,10 +80,10 @@ const App = () => {
 
         <Route
           path="/signup-page"
-          element={<SignupPage categories={categories} />}
+          element={<SignupPage />}
         />
 
-        <Route path="/signup-success" element={<Confirmation />} />
+        <Route path="/signup-success" element={<Success />} />
 
         <Route
           path="/watch-list"
