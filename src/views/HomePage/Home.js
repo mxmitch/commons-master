@@ -26,7 +26,6 @@ export default function Home({ user }) {
   return (
     <div>
       {/* FIXED HEADER OFFSET */}
-      <div style={{ marginTop: '-64px' }}>
         <Parallax image={require('../../assets/img/bg7.jpg')}>
           <div className={classes.container}>
             <GridContainer justifyContent="center">
@@ -42,7 +41,7 @@ export default function Home({ user }) {
             </GridContainer>
           </div>
         </Parallax>
-      </div>
+      
 
       <div className={classnames(classes.main, classes.mainRaised)}>
         <Typography
